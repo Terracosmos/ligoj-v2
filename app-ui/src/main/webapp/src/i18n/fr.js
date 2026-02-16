@@ -204,4 +204,49 @@ export default {
   'error.notFound': 'Page introuvable',
   'error.notFoundMsg': 'La page n\'existe pas ou nécessite un plugin qui n\'est pas installé.',
   'error.pluginFailed': 'Échec du chargement du plugin',
+
+  // Common (additions)
+  'common.confirm': 'Confirmer',
+
+  // User actions
+  'user.actions': 'Actions',
+  'user.lock': 'Verrouiller',
+  'user.unlock': 'Déverrouiller',
+  'user.isolate': 'Isoler',
+  'user.restore': 'Restaurer',
+  'user.resetPassword': 'Réinitialiser le mot de passe',
+  'user.lockConfirm': 'Verrouiller l\'utilisateur {{id}} ? Il ne pourra plus se connecter.',
+  'user.unlockConfirm': 'Déverrouiller l\'utilisateur {{id}} ?',
+  'user.isolateConfirm': 'Isoler l\'utilisateur {{id}} ? Cela supprimera toutes ses appartenances aux groupes.',
+  'user.restoreConfirm': 'Restaurer l\'utilisateur {{id}} ? Cela rétablira ses appartenances précédentes aux groupes.',
+  'user.resetPasswordConfirm': 'Réinitialiser le mot de passe de {{id}} ? Un mot de passe temporaire sera généré.',
+  'user.demoAction': 'Mode démo — Connectez un plugin IAM pour effectuer cette action',
+
+  // Container Scopes
+  'nav.containerScopes': 'Portées de conteneurs',
+  'containerScope.title': 'Portées de conteneurs',
+  'containerScope.new': 'Nouvelle portée',
+  'containerScope.edit': 'Modifier la portée',
+  'containerScope.deleteTitle': 'Supprimer la portée',
+  'containerScope.deleteConfirm': 'Êtes-vous certain de supprimer {{name}} ?',
+  'containerScope.noProvider': 'Aucun fournisseur d\'identité configuré.',
+  'containerScope.demoMode': 'Données de démo. Connectez un plugin IAM pour la gestion en temps réel.',
+  'containerScope.demoSave': 'Mode démo — Connectez un plugin IAM pour enregistrer les modifications',
+  'containerScope.demoDelete': 'Mode démo — Connectez un plugin IAM pour supprimer des portées',
+
+  // Agreement
+  'agreement.title': 'Accord de sécurité',
+  'agreement.text': 'Vous êtes sur le point d\'effectuer une opération sensible. Veuillez lire et accepter l\'accord de sécurité avant de continuer.',
+  'agreement.checkbox': 'J\'ai lu et j\'accepte l\'accord de sécurité',
+  'agreement.accept': 'Accepter et continuer',
+
+  // Import progress
+  'import.progress': 'Import en cours...',
+  'import.entries': '{{count}} entrées traitées',
+  'import.done': 'Import terminé avec succès',
+  'import.failed': 'Import échoué',
+
+  // Group parent
+  'group.parent': 'Groupe parent',
+  'group.parentHint': 'Groupe parent optionnel pour la hiérarchie',
 }

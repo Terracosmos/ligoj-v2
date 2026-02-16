@@ -17,6 +17,7 @@ const NAV_CONFIG = [
       { id: 'id-group', label: 'Groups', labelKey: 'nav.groups', icon: 'mdi-account-group-outline', route: '/id/group', auth: '^id/container/group' },
       { id: 'id-company', label: 'Companies', labelKey: 'nav.companies', icon: 'mdi-domain', route: '/id/company', auth: '^id/container/company' },
       { id: 'id-delegate', label: 'Delegates', labelKey: 'nav.delegates', icon: 'mdi-account-switch', route: '/id/delegate', auth: '^id/delegate' },
+      { id: 'id-container-scope', label: 'Container Scopes', labelKey: 'nav.containerScopes', icon: 'mdi-shape', route: '/id/container-scope', auth: '^id/container-scope' },
     ],
   },
   {

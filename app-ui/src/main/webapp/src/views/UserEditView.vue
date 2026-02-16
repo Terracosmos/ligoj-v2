@@ -77,6 +77,48 @@
       </v-card-actions>
     </v-card>
 
+    <v-card v-if="isEdit && !loading" class="edit-card mt-4">
+      <v-card-title class="text-h6">{{ t('user.actions') }}</v-card-title>
+      <v-card-text>
+        <div class="d-flex flex-wrap ga-2">
+          <v-btn
+            v-if="!locked"
+            color="warning"
+            variant="tonal"
+            prepend-icon="mdi-lock"
+            @click="startAction('lock')"
+          >{{ t('user.lock') }}</v-btn>
+          <v-btn
+            v-if="locked"
+            color="success"
+            variant="tonal"
+            prepend-icon="mdi-lock-open-variant"
+            @click="startAction('unlock')"
+          >{{ t('user.unlock') }}</v-btn>
+          <v-btn
+            v-if="!isolated"
+            color="error"
+            variant="tonal"
+            prepend-icon="mdi-account-off"
+            @click="startAction('isolate')"
+          >{{ t('user.isolate') }}</v-btn>
+          <v-btn
+            v-if="isolated"
+            color="success"
+            variant="tonal"
+            prepend-icon="mdi-account-check"
+            @click="startAction('restore')"
+          >{{ t('user.restore') }}</v-btn>
+          <v-btn
+            color="info"
+            variant="tonal"
+            prepend-icon="mdi-lock-reset"
+            @click="startAction('resetPassword')"
+          >{{ t('user.resetPassword') }}</v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+
     <v-dialog v-model="confirmDelete" max-width="400">
       <v-card>
         <v-card-title>{{ t('user.deleteTitle') }}</v-card-title>
@@ -99,6 +141,18 @@
           <v-spacer />
           <v-btn variant="text" @click="cancelLeave">{{ t('common.cancel') }}</v-btn>
           <v-btn color="warning" variant="elevated" @click="confirmLeave">{{ t('common.discard') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="actionDialog" max-width="400">
+      <v-card>
+        <v-card-title>{{ t('user.' + actionType) }}</v-card-title>
+        <v-card-text>{{ t('user.' + actionType + 'Confirm', { id: form.id }) }}</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="actionDialog = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="primary" variant="elevated" :loading="actionLoading" @click="confirmAction">{{ t('common.confirm') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -129,6 +183,11 @@ const deleting = ref(false)
 const confirmDelete = ref(false)
 const demoMode = ref(false)
 const groups = ref([])
+const locked = ref(false)
+const isolated = ref(false)
+const actionDialog = ref(false)
+const actionType = ref('')
+const actionLoading = ref(false)
 
 const isEdit = computed(() => !!route.params.id)
 const groupsDisplay = computed(() => groups.value.map(g => g.name || g).join(', ') || '-')
@@ -168,6 +227,8 @@ function loadDemoUser(id) {
     form.value.company = user.company
     form.value.mail = user.mails?.[0] || ''
     groups.value = user.groups || []
+    locked.value = !!user.locked
+    isolated.value = !!user.isolated
   }
 }
 
@@ -182,6 +243,8 @@ onMounted(async () => {
       form.value.company = data.company || ''
       form.value.mail = data.mails?.[0] || ''
       groups.value = data.groups || []
+      locked.value = !!data.locked
+      isolated.value = !!data.isolated
     } else {
       // API unavailable — use demo data
       demoMode.value = true
@@ -255,6 +318,36 @@ async function remove() {
   confirmDelete.value = false
   markClean()
   router.push('/id/user')
+}
+
+function startAction(type) {
+  actionType.value = type
+  actionDialog.value = true
+}
+
+async function confirmAction() {
+  if (demoMode.value) {
+    errorStore.push({ message: t('user.demoAction'), status: 0 })
+    actionDialog.value = false
+    return
+  }
+  actionLoading.value = true
+  const id = form.value.id
+  const actions = {
+    lock: () => api.del(`rest/service/id/user/${id}/lock`),
+    unlock: () => api.put(`rest/service/id/user/${id}/unlock`),
+    isolate: () => api.del(`rest/service/id/user/${id}/isolate`),
+    restore: () => api.put(`rest/service/id/user/${id}/restore`),
+    resetPassword: () => api.put(`rest/service/id/user/${id}/reset`),
+  }
+  await actions[actionType.value]()
+  actionLoading.value = false
+  actionDialog.value = false
+  // Update local state
+  if (actionType.value === 'lock') locked.value = true
+  if (actionType.value === 'unlock') locked.value = false
+  if (actionType.value === 'isolate') isolated.value = true
+  if (actionType.value === 'restore') isolated.value = false
 }
 </script>
 

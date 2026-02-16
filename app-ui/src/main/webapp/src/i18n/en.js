@@ -204,4 +204,49 @@ export default {
   'error.notFound': 'Page not found',
   'error.notFoundMsg': 'The page does not exist or requires a plugin that is not installed.',
   'error.pluginFailed': 'Failed to load plugin',
+
+  // Common (additions)
+  'common.confirm': 'Confirm',
+
+  // User actions
+  'user.actions': 'Actions',
+  'user.lock': 'Lock',
+  'user.unlock': 'Unlock',
+  'user.isolate': 'Isolate',
+  'user.restore': 'Restore',
+  'user.resetPassword': 'Reset Password',
+  'user.lockConfirm': 'Lock user {{id}}? They will no longer be able to sign in.',
+  'user.unlockConfirm': 'Unlock user {{id}}?',
+  'user.isolateConfirm': 'Isolate user {{id}}? This will remove all group memberships.',
+  'user.restoreConfirm': 'Restore user {{id}}? This will re-add previous group memberships.',
+  'user.resetPasswordConfirm': 'Reset the password for {{id}}? A new temporary password will be generated.',
+  'user.demoAction': 'Demo mode — Connect an IAM plugin to perform this action',
+
+  // Container Scopes
+  'nav.containerScopes': 'Container Scopes',
+  'containerScope.title': 'Container Scopes',
+  'containerScope.new': 'New Scope',
+  'containerScope.edit': 'Edit Scope',
+  'containerScope.deleteTitle': 'Delete Scope',
+  'containerScope.deleteConfirm': 'Are you sure you want to delete {{name}}?',
+  'containerScope.noProvider': 'No identity provider is configured.',
+  'containerScope.demoMode': 'Showing demo data. Connect an IAM plugin for live management.',
+  'containerScope.demoSave': 'Demo mode — Connect an IAM plugin to save changes',
+  'containerScope.demoDelete': 'Demo mode — Connect an IAM plugin to delete scopes',
+
+  // Agreement
+  'agreement.title': 'Security Agreement',
+  'agreement.text': 'You are about to perform a sensitive operation. Please read and accept the security agreement before continuing.',
+  'agreement.checkbox': 'I have read and accept the security agreement',
+  'agreement.accept': 'Accept & Continue',
+
+  // Import progress
+  'import.progress': 'Import in progress...',
+  'import.entries': '{{count}} entries processed',
+  'import.done': 'Import completed successfully',
+  'import.failed': 'Import failed',
+
+  // Group parent
+  'group.parent': 'Parent Group',
+  'group.parentHint': 'Optional parent group for hierarchy',
 }
