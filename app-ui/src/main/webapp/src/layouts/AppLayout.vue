@@ -58,6 +58,7 @@
         />
       </v-list>
     </v-menu>
+    <NotificationBell />
     <v-btn icon size="small" @click="toggleTheme">
       <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
     </v-btn>
@@ -84,6 +85,7 @@ import { useTheme } from 'vuetify'
 import { useAuthStore } from '@/stores/auth.js'
 import { useAppStore } from '@/stores/app.js'
 import { useI18nStore } from '@/stores/i18n.js'
+import NotificationBell from '@/components/NotificationBell.vue'
 
 const router = useRouter()
 const route = useRoute()

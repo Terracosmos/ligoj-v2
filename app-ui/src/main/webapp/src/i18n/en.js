@@ -160,6 +160,15 @@ export default {
   'login.error': 'Login failed',
   'login.networkError': 'Network error. Please try again.',
 
+  // Notifications
+  'notification.title': 'Notifications',
+  'notification.empty': 'No notifications',
+  'notification.markAllRead': 'Mark all read',
+  'notification.justNow': 'Just now',
+  'notification.minutesAgo': '{{n}} min ago',
+  'notification.hoursAgo': '{{n}}h ago',
+  'notification.daysAgo': '{{n}}d ago',
+
   // Errors & 404
   'error.notFound': 'Page not found',
   'error.notFoundMsg': 'The page does not exist or requires a plugin that is not installed.',
