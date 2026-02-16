@@ -92,22 +92,42 @@ export default {
 
   // Groups
   'group.title': 'Groupes',
+  'group.new': 'Nouveau groupe',
+  'group.edit': 'Modifier le groupe',
   'group.scope': 'Portée',
   'group.members': 'Membres',
   'group.locked': 'Verrouillé',
+  'group.deleteTitle': 'Supprimer le groupe',
+  'group.deleteConfirm': 'Êtes-vous certain de supprimer {{name}} ?',
   'group.noProvider': 'Aucun fournisseur d\'identité configuré. Connectez un plugin IAM (LDAP, AD, etc.) pour gérer les groupes.',
+  'group.demoEdit': 'Mode démo — Aucun fournisseur d\'identité configuré. Connectez un plugin IAM (LDAP, AD, etc.) pour gérer les groupes.',
+  'group.demoDelete': 'Mode démo — Connectez un plugin IAM pour supprimer des groupes',
+  'group.demoSave': 'Mode démo — Connectez un plugin IAM pour enregistrer les modifications',
 
   // Companies
   'company.title': 'Entités',
+  'company.new': 'Nouvelle entité',
+  'company.edit': 'Modifier l\'entité',
+  'company.deleteTitle': 'Supprimer l\'entité',
+  'company.deleteConfirm': 'Êtes-vous certain de supprimer {{name}} ?',
   'company.noProvider': 'Aucun fournisseur d\'identité configuré. Connectez un plugin IAM (LDAP, AD, etc.) pour gérer les entités.',
+  'company.demoEdit': 'Mode démo — Aucun fournisseur d\'identité configuré. Connectez un plugin IAM (LDAP, AD, etc.) pour gérer les entités.',
+  'company.demoDelete': 'Mode démo — Connectez un plugin IAM pour supprimer des entités',
+  'company.demoSave': 'Mode démo — Connectez un plugin IAM pour enregistrer les modifications',
 
   // Delegates
   'delegate.title': 'Délégués',
+  'delegate.new': 'Nouveau délégué',
+  'delegate.edit': 'Modifier le délégué',
   'delegate.receiver': 'Destinataire',
+  'delegate.receiverType': 'Type de destinataire',
   'delegate.type': 'Type',
   'delegate.resource': 'Ressource',
+  'delegate.resourceHint': 'Motif de ressource (ex: ou=.*)',
   'delegate.admin': 'Admin',
   'delegate.write': 'Écriture',
+  'delegate.deleteTitle': 'Supprimer le délégué',
+  'delegate.deleteConfirm': 'Êtes-vous certain de supprimer la délégation pour {{name}} ?',
   'delegate.empty': 'Aucun délégué configuré.',
 
   // Administration

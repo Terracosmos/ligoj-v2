@@ -1,55 +1,85 @@
 <template>
-  <div class="login-page">
-    <div class="login-card">
-      <div class="login-header">
-        <img src="@/assets/ligoj.svg" alt="Ligoj" class="login-logo" />
-        <h1>Ligoj</h1>
-      </div>
+  <v-app>
+    <v-main class="login-bg d-flex align-center justify-center">
+      <v-card width="400" elevation="8" rounded="lg" class="pa-4">
+        <v-card-text class="text-center pb-0">
+          <img src="@/assets/ligoj.svg" alt="Ligoj" style="width: 48px; height: 48px" />
+          <h1 class="text-h5 font-weight-bold mt-2 mb-4" style="color: #1a237e">Ligoj</h1>
+        </v-card-text>
 
-      <form class="login-form" @submit.prevent="doLogin">
-        <div v-if="errorMsg" class="login-error">{{ errorMsg }}</div>
+        <v-card-text>
+          <v-alert v-if="errorMsg" type="error" variant="tonal" density="compact" class="mb-4">
+            {{ errorMsg }}
+          </v-alert>
 
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            autocomplete="username"
-            autofocus
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            autocomplete="current-password"
-            required
-          />
-        </div>
-
-        <button type="submit" class="login-btn" :disabled="loading">
-          <span v-if="loading" class="spinner"></span>
-          <span v-else>Sign in</span>
-        </button>
-      </form>
-    </div>
-  </div>
+          <v-form @submit.prevent="doLogin">
+            <v-text-field
+              v-model="username"
+              :label="msg.username"
+              prepend-inner-icon="mdi-account"
+              variant="outlined"
+              autofocus
+              autocomplete="username"
+              :rules="[v => !!v || msg.required]"
+              class="mb-2"
+            />
+            <v-text-field
+              v-model="password"
+              :label="msg.password"
+              prepend-inner-icon="mdi-lock"
+              :type="showPwd ? 'text' : 'password'"
+              :append-inner-icon="showPwd ? 'mdi-eye-off' : 'mdi-eye'"
+              @click:append-inner="showPwd = !showPwd"
+              variant="outlined"
+              autocomplete="current-password"
+              :rules="[v => !!v || msg.required]"
+              class="mb-4"
+            />
+            <v-btn
+              type="submit"
+              color="primary"
+              size="large"
+              block
+              :loading="loading"
+            >{{ msg.submit }}</v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
+
+const isFr = (navigator.language || '').startsWith('fr')
+
+const msg = reactive(isFr ? {
+  username: 'Nom d\'utilisateur',
+  password: 'Mot de passe',
+  submit: 'Se connecter',
+  required: 'Ce champ est requis',
+  failed: 'Identifiant ou mot de passe invalide',
+  error: 'Échec de la connexion',
+  network: 'Erreur réseau. Veuillez réessayer.',
+} : {
+  username: 'Username',
+  password: 'Password',
+  submit: 'Sign in',
+  required: 'This field is required',
+  failed: 'Invalid username or password',
+  error: 'Login failed',
+  network: 'Network error. Please try again.',
+})
 
 const username = ref('')
 const password = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
+const showPwd = ref(false)
 
 async function doLogin() {
+  if (!username.value || !password.value) return
   loading.value = true
   errorMsg.value = ''
   try {
@@ -64,12 +94,12 @@ async function doLogin() {
     })
     const data = await resp.json().catch(() => null)
     if (!resp.ok || (data && !data.success)) {
-      errorMsg.value = resp.status === 401 ? 'Invalid username or password' : 'Login failed'
+      errorMsg.value = resp.status === 401 ? msg.failed : msg.error
       return
     }
     window.location.href = 'v-index.html'
   } catch {
-    errorMsg.value = 'Network error. Please try again.'
+    errorMsg.value = msg.network
   } finally {
     loading.value = false
   }
@@ -77,96 +107,8 @@ async function doLogin() {
 </script>
 
 <style scoped>
-.login-page {
+.login-bg {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%);
-  font-family: 'Segoe UI', Roboto, sans-serif;
-}
-.login-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-.login-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-.login-logo {
-  height: 48px;
-  margin-bottom: 0.5rem;
-}
-.login-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #1a237e;
-}
-.form-group {
-  margin-bottom: 1.25rem;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #333;
-}
-.form-group input {
-  width: 100%;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-}
-.form-group input:focus {
-  outline: none;
-  border-color: #1a237e;
-  box-shadow: 0 0 0 2px rgba(26,35,126,0.15);
-}
-.login-btn {
-  width: 100%;
-  padding: 0.75rem;
-  background: #1a237e;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.login-btn:hover:not(:disabled) {
-  background: #0d47a1;
-}
-.login-btn:disabled {
-  opacity: 0.7;
-  cursor: wait;
-}
-.login-error {
-  background: #ffebee;
-  color: #c62828;
-  padding: 0.65rem 0.75rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-}
-.spinner {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 </style>

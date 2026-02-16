@@ -92,22 +92,42 @@ export default {
 
   // Groups
   'group.title': 'Groups',
+  'group.new': 'New Group',
+  'group.edit': 'Edit Group',
   'group.scope': 'Scope',
   'group.members': 'Members',
   'group.locked': 'Locked',
+  'group.deleteTitle': 'Delete Group',
+  'group.deleteConfirm': 'Are you sure you want to delete {{name}}?',
   'group.noProvider': 'No identity provider is configured. Connect an IAM plugin (LDAP, AD, etc.) to manage groups.',
+  'group.demoEdit': 'Demo mode — No identity provider configured. Connect an IAM plugin (LDAP, AD, etc.) to manage groups.',
+  'group.demoDelete': 'Demo mode — Connect an IAM plugin to delete groups',
+  'group.demoSave': 'Demo mode — Connect an IAM plugin to save changes',
 
   // Companies
   'company.title': 'Companies',
+  'company.new': 'New Company',
+  'company.edit': 'Edit Company',
+  'company.deleteTitle': 'Delete Company',
+  'company.deleteConfirm': 'Are you sure you want to delete {{name}}?',
   'company.noProvider': 'No identity provider is configured. Connect an IAM plugin (LDAP, AD, etc.) to manage companies.',
+  'company.demoEdit': 'Demo mode — No identity provider configured. Connect an IAM plugin (LDAP, AD, etc.) to manage companies.',
+  'company.demoDelete': 'Demo mode — Connect an IAM plugin to delete companies',
+  'company.demoSave': 'Demo mode — Connect an IAM plugin to save changes',
 
   // Delegates
   'delegate.title': 'Delegates',
+  'delegate.new': 'New Delegate',
+  'delegate.edit': 'Edit Delegate',
   'delegate.receiver': 'Receiver',
+  'delegate.receiverType': 'Receiver Type',
   'delegate.type': 'Type',
   'delegate.resource': 'Resource',
+  'delegate.resourceHint': 'Resource pattern (e.g. ou=.*)',
   'delegate.admin': 'Admin',
   'delegate.write': 'Write',
+  'delegate.deleteTitle': 'Delete Delegate',
+  'delegate.deleteConfirm': 'Are you sure you want to delete the delegation for {{name}}?',
   'delegate.empty': 'No delegates configured.',
 
   // Administration
