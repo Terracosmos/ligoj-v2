@@ -37,7 +37,7 @@
         {{ item.teamLeader?.id || '-' }}
       </template>
       <template #item.actions="{ item }">
-        <v-btn icon size="small" variant="text" @click.stop="router.push('/home/project/' + item.id)">
+        <v-btn icon size="small" variant="text" @click.stop="router.push('/home/project/' + item.id + '/edit')">
           <v-icon size="small">mdi-pencil</v-icon>
         </v-btn>
         <v-btn icon size="small" variant="text" color="error" @click.stop="startDelete(item)">
