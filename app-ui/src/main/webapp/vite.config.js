@@ -1,0 +1,45 @@
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path'
+
+export default defineConfig({
+  plugins: [vue()],
+  base: '/ligoj/',
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'v-index.html'),
+        login: resolve(__dirname, 'v-login.html'),
+      },
+      external: [/^\/main\//, /^\/ligoj\/main\//],
+    },
+    outDir: resolve(__dirname, '../../../target/classes/META-INF/resources/webjars/vue-dist'),
+    emptyOutDir: true,
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      '/rest': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      '/webjars': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      '/ligoj/rest': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      '/ligoj/webjars': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+    },
+  },
+})

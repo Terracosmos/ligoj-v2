@@ -1,0 +1,69 @@
+<template>
+  <div>
+    <h1 class="text-h4 mb-2">Dashboard</h1>
+    <p class="text-subtitle-1 text-medium-emphasis mb-6">Welcome, {{ auth.userName }}</p>
+    <v-row>
+      <v-col
+        v-for="card in cards"
+        :key="card.id"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+      >
+        <v-card :to="card.route" hover elevation="2" rounded="lg">
+          <v-card-item>
+            <template #prepend>
+              <v-avatar :color="card.color" size="48">
+                <v-icon color="white">{{ card.icon }}</v-icon>
+              </v-avatar>
+            </template>
+            <v-card-title>{{ card.label }}</v-card-title>
+            <v-card-subtitle v-if="card.subtitle">{{ card.subtitle }}</v-card-subtitle>
+          </v-card-item>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-alert v-if="!cards.length" type="info" variant="tonal" class="mt-4">
+      No modules available.
+    </v-alert>
+  </div>
+</template>
+
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth.js'
+import { useAppStore } from '@/stores/app.js'
+
+const auth = useAuthStore()
+const appStore = useAppStore()
+
+const CARD_META = {
+  'id-user': { color: 'blue', subtitle: 'Manage user accounts' },
+  'id-group': { color: 'teal', subtitle: 'Manage groups' },
+  'id-company': { color: 'indigo', subtitle: 'Manage companies' },
+  'id-delegate': { color: 'purple', subtitle: 'Manage delegations' },
+  'project': { color: 'orange', subtitle: 'Manage projects and subscriptions' },
+}
+
+/** Flatten nav items into dashboard cards */
+const cards = computed(() => {
+  const result = []
+  for (const item of auth.navItems) {
+    if (item.id === 'home') continue // skip home itself
+    if (item.children) {
+      for (const child of item.children) {
+        result.push({ ...child, ...(CARD_META[child.id] || {}) })
+      }
+    } else {
+      result.push({ ...item, ...(CARD_META[item.id] || {}) })
+    }
+  }
+  return result
+})
+
+onMounted(() => {
+  appStore.setTitle('Dashboard')
+  appStore.setBreadcrumbs([{ title: 'Home', to: '/' }])
+})
+</script>

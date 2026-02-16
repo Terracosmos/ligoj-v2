@@ -1,6 +1,7 @@
 ARG BUILDPLATFORM
 ARG TARGETPLATFORM
 ARG JAVA_VERSION="21-jdk"
+ARG JAVA_IMAGE="eclipse-temurin"
 ARG NODE_VERSION="20-bookworm-slim"
 ARG MAVEN_VERSION="3.9.6-amazoncorretto-21-debian-bookworm"
 
@@ -15,6 +16,14 @@ RUN touch ~/.bash_profile && \
     mkdir -p src/main/build && mkdir -p src/main/webapp && \
     chmod +x src/main/build/minify.sh && src/main/build/minify.sh
 
+# Vue 3 build
+WORKDIR /build/src/main/webapp
+RUN npm install && npm run build -- --outDir ./vue-dist --emptyOutDir && \
+    cp vue-dist/v-index.html . && \
+    cp vue-dist/v-login.html . && \
+    cp -r vue-dist/assets/ .
+WORKDIR /build/
+
 FROM --platform=${BUILDPLATFORM} maven:${MAVEN_VERSION} as builder
 WORKDIR /build/
 ADD . .
@@ -24,7 +33,7 @@ RUN export MAVEN_OPTS="-Dmaven.test.skip=true -Dmaven.wagon.http.ssl.insecure=tr
     { [ -f prepare-build.sh ] && chmod +x prepare-build.sh && . ./prepare-build.sh || echo "No defined prepare build instruction, create a prepare-build.sh script to prepare http_proxy or other custom configurations."; } && \
     mvn clean package -B
 
-FROM --platform=${TARGETPLATFORM} openjdk:${JAVA_VERSION}
+FROM --platform=${TARGETPLATFORM} ${JAVA_IMAGE}:${JAVA_VERSION}
 ARG VERSION="4.0.1-SNAPSHOT"
 ARG ARTIFACT_ID="app-ui"
 ARG SERVER_HOME="/usr/local/ligoj"
