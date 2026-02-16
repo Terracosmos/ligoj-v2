@@ -2,18 +2,18 @@
   <div>
     <v-progress-linear v-if="loading" indeterminate color="primary" />
     <v-alert v-else-if="error" type="error" variant="tonal" class="mb-4">
-      Failed to load plugin: {{ error }}
+      {{ t('error.pluginFailed') }}: {{ error }}
     </v-alert>
     <component :is="pluginComponent" v-else-if="pluginComponent" />
     <!-- 404 fallback when no plugin matches -->
     <div v-else-if="notFound" class="d-flex flex-column align-center justify-center" style="min-height: 50vh">
       <v-icon size="96" color="primary" class="mb-4">mdi-compass-outline</v-icon>
-      <h1 class="text-h4 mb-2">Page not found</h1>
+      <h1 class="text-h4 mb-2">{{ t('error.notFound') }}</h1>
       <p class="text-subtitle-1 text-medium-emphasis mb-6">
-        The page <code>{{ route.path }}</code> does not exist or requires a plugin that is not installed.
+        {{ t('error.notFoundMsg') }}
       </p>
       <v-btn color="primary" variant="flat" prepend-icon="mdi-home" to="/">
-        Back to Dashboard
+        {{ t('common.backHome') }}
       </v-btn>
     </div>
   </div>
@@ -25,9 +25,12 @@ import { useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app.js'
 import { loadPlugin } from '@/plugins/loader.js'
 import registry from '@/plugins/registry.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const route = useRoute()
 const appStore = useAppStore()
+const i18n = useI18nStore()
+const t = i18n.t
 
 const loading = ref(false)
 const error = ref(null)

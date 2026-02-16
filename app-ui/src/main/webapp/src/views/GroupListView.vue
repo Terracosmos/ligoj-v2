@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="d-flex align-center mb-4">
-      <h1 class="text-h4">Groups</h1>
+      <h1 class="text-h4">{{ t('group.title') }}</h1>
       <v-spacer />
       <v-text-field
         v-model="dt.search.value"
         prepend-inner-icon="mdi-magnify"
-        label="Search"
+        :label="t('common.search')"
         variant="outlined"
         density="compact"
         hide-details
@@ -16,12 +16,12 @@
     </div>
 
     <v-alert v-if="dt.error.value" type="warning" variant="tonal" class="mb-4">
-      <v-alert-title>Identity provider not available</v-alert-title>
-      {{ dt.error.value === 'internal' ? 'No identity provider is configured. Connect an IAM plugin (LDAP, AD, etc.) to manage groups.' : dt.error.value }}
+      <v-alert-title>{{ t('user.noProvider') }}</v-alert-title>
+      {{ dt.error.value === 'internal' ? t('group.noProvider') : dt.error.value }}
     </v-alert>
 
     <v-alert v-if="dt.demoMode.value" type="info" variant="tonal" density="compact" class="mb-4">
-      Showing cached identity data. Connect an IAM plugin for live management.
+      {{ t('user.demoMode') }}
     </v-alert>
 
     <v-data-table-server
@@ -41,11 +41,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useDataTable } from '@/composables/useDataTable.js'
 import { useAppStore } from '@/stores/app.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const appStore = useAppStore()
+const i18n = useI18nStore()
+const t = i18n.t
+
 const DEMO_GROUPS = [
   { name: 'Engineering', scope: 'Group', count: 4, locked: false },
   { name: 'Marketing', scope: 'Group', count: 1, locked: false },
@@ -57,12 +61,12 @@ const dt = useDataTable('service/id/group', { defaultSort: 'name', demoData: DEM
 const itemsPerPage = ref(25)
 let searchTimeout = null
 
-const headers = [
-  { title: 'Name', key: 'name', sortable: true },
-  { title: 'Scope', key: 'scope', sortable: false },
-  { title: 'Members', key: 'count', sortable: false, width: '100px' },
-  { title: 'Locked', key: 'locked', sortable: false, width: '80px' },
-]
+const headers = computed(() => [
+  { title: t('common.name'), key: 'name', sortable: true },
+  { title: t('group.scope'), key: 'scope', sortable: false },
+  { title: t('group.members'), key: 'count', sortable: false, width: '100px' },
+  { title: t('group.locked'), key: 'locked', sortable: false, width: '80px' },
+])
 
 function loadData(options) {
   dt.load(options)
@@ -74,11 +78,11 @@ function onSearch() {
 }
 
 onMounted(() => {
-  appStore.setTitle('Groups')
+  appStore.setTitle(t('group.title'))
   appStore.setBreadcrumbs([
-    { title: 'Home', to: '/' },
-    { title: 'Identity' },
-    { title: 'Groups' },
+    { title: t('nav.home'), to: '/' },
+    { title: t('nav.identity') },
+    { title: t('group.title') },
   ])
 })
 </script>

@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="d-flex align-center mb-4">
-      <h1 class="text-h4">Projects</h1>
+      <h1 class="text-h4">{{ t('project.title') }}</h1>
       <v-spacer />
       <v-text-field
         v-model="dt.search.value"
         prepend-inner-icon="mdi-magnify"
-        label="Search"
+        :label="t('common.search')"
         variant="outlined"
         density="compact"
         hide-details
@@ -14,7 +14,7 @@
         @update:model-value="onSearch"
       />
       <v-btn color="primary" prepend-icon="mdi-plus" @click="router.push('/home/project/new')">
-        New Project
+        {{ t('project.new') }}
       </v-btn>
     </div>
 
@@ -47,19 +47,19 @@
     </v-data-table-server>
 
     <v-alert v-if="!dt.loading.value && !dt.error.value && dt.totalItems.value === 0" type="info" variant="tonal" class="mt-4">
-      No projects yet. Create a project to start managing subscriptions.
+      {{ t('project.empty') }}
     </v-alert>
 
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
-        <v-card-title>Delete Project</v-card-title>
+        <v-card-title>{{ t('project.deleteTitle') }}</v-card-title>
         <v-card-text>
-          Are you sure you want to delete <strong>{{ deleteTarget?.name }}</strong>?
+          {{ t('project.deleteConfirm', { name: deleteTarget?.name }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" :loading="deleting" @click="confirmDelete">Delete</v-btn>
+          <v-btn variant="text" @click="deleteDialog = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" :loading="deleting" @click="confirmDelete">{{ t('common.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -67,15 +67,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDataTable } from '@/composables/useDataTable.js'
 import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const router = useRouter()
 const appStore = useAppStore()
 const api = useApi()
+const i18n = useI18nStore()
+const t = i18n.t
 const dt = useDataTable('project', { defaultSort: 'name' })
 const itemsPerPage = ref(25)
 let searchTimeout = null
@@ -85,13 +88,13 @@ const deleteTarget = ref(null)
 const deleting = ref(false)
 let lastOptions = {}
 
-const headers = [
-  { title: 'Name', key: 'name', sortable: true },
-  { title: 'Description', key: 'description', sortable: false },
-  { title: 'Team Leader', key: 'teamLeader', sortable: false },
-  { title: 'Pkey', key: 'pkey', sortable: true },
+const headers = computed(() => [
+  { title: t('common.name'), key: 'name', sortable: true },
+  { title: t('project.description'), key: 'description', sortable: false },
+  { title: t('project.teamLeader'), key: 'teamLeader', sortable: false },
+  { title: t('project.pkey'), key: 'pkey', sortable: true },
   { title: '', key: 'actions', sortable: false, width: '100px', align: 'end' },
-]
+])
 
 function loadData(options) {
   lastOptions = options
@@ -118,10 +121,10 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
-  appStore.setTitle('Projects')
+  appStore.setTitle(t('project.title'))
   appStore.setBreadcrumbs([
-    { title: 'Home', to: '/' },
-    { title: 'Projects' },
+    { title: t('nav.home'), to: '/' },
+    { title: t('project.title') },
   ])
 })
 </script>

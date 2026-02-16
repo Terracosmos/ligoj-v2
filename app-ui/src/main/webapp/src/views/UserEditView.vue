@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="d-flex align-center mb-4">
-      <h1 class="text-h4">{{ isEdit ? 'Edit User' : 'New User' }}</h1>
+      <h1 class="text-h4">{{ isEdit ? t('user.edit') : t('user.new') }}</h1>
     </div>
 
     <v-alert v-if="demoMode" type="info" variant="tonal" density="compact" class="mb-4">
-      Demo mode — No identity provider configured. Connect an IAM plugin (LDAP, AD, etc.) to manage users.
+      {{ t('user.demoEdit') }}
     </v-alert>
 
     <v-card :loading="loading" max-width="700">
@@ -13,37 +13,37 @@
         <v-form ref="formRef" @submit.prevent="save">
           <v-text-field
             v-model="form.id"
-            label="Login"
+            :label="t('user.login')"
             :rules="[rules.required]"
             :disabled="isEdit"
-            :hint="isEdit ? '' : 'Unique login, cannot be changed after creation'"
+            :hint="isEdit ? '' : t('user.loginHint')"
             persistent-hint
             variant="outlined"
             class="mb-2"
           />
           <v-text-field
             v-model="form.firstName"
-            label="First Name"
+            :label="t('user.firstName')"
             :rules="[rules.required]"
             variant="outlined"
             class="mb-2"
           />
           <v-text-field
             v-model="form.lastName"
-            label="Last Name"
+            :label="t('user.lastName')"
             :rules="[rules.required]"
             variant="outlined"
             class="mb-2"
           />
           <v-text-field
             v-model="form.company"
-            label="Company"
+            :label="t('user.company')"
             variant="outlined"
             class="mb-2"
           />
           <v-text-field
             v-model="form.mail"
-            label="Email"
+            :label="t('user.email')"
             type="email"
             variant="outlined"
             class="mb-2"
@@ -51,7 +51,7 @@
           <v-text-field
             v-if="isEdit"
             :model-value="groupsDisplay"
-            label="Groups"
+            :label="t('user.groups')"
             variant="outlined"
             readonly
             class="mb-2"
@@ -60,26 +60,26 @@
       </v-card-text>
       <v-card-actions>
         <v-btn v-if="isEdit" color="error" variant="tonal" @click="confirmDelete = true">
-          <v-icon start>mdi-delete</v-icon> Delete
+          <v-icon start>mdi-delete</v-icon> {{ t('common.delete') }}
         </v-btn>
         <v-spacer />
-        <v-btn variant="text" @click="router.push('/id/user')">Cancel</v-btn>
+        <v-btn variant="text" @click="router.push('/id/user')">{{ t('common.cancel') }}</v-btn>
         <v-btn color="primary" variant="elevated" :loading="saving" @click="save">
-          <v-icon start>mdi-content-save</v-icon> Save
+          <v-icon start>mdi-content-save</v-icon> {{ t('common.save') }}
         </v-btn>
       </v-card-actions>
     </v-card>
 
     <v-dialog v-model="confirmDelete" max-width="400">
       <v-card>
-        <v-card-title>Delete User</v-card-title>
+        <v-card-title>{{ t('user.deleteTitle') }}</v-card-title>
         <v-card-text>
-          Are you sure you want to delete <strong>{{ form.id }}</strong>? This action cannot be undone.
+          {{ t('user.deleteConfirm', { id: form.id }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="confirmDelete = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" :loading="deleting" @click="remove">Delete</v-btn>
+          <v-btn variant="text" @click="confirmDelete = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" :loading="deleting" @click="remove">{{ t('common.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -92,12 +92,15 @@ import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
 import { useErrorStore } from '@/stores/error.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const route = useRoute()
 const router = useRouter()
 const api = useApi()
 const appStore = useAppStore()
 const errorStore = useErrorStore()
+const i18n = useI18nStore()
+const t = i18n.t
 
 const formRef = ref(null)
 const loading = ref(false)
@@ -119,7 +122,7 @@ const form = ref({
 })
 
 const rules = {
-  required: v => !!v || 'This field is required',
+  required: v => !!v || t('common.required'),
 }
 
 // Demo users matching UserListView
@@ -164,20 +167,20 @@ onMounted(async () => {
       loadDemoUser(route.params.id)
     }
     loading.value = false
-    appStore.setTitle('Edit User')
+    appStore.setTitle(t('user.edit'))
     appStore.setBreadcrumbs([
-      { title: 'Home', to: '/' },
-      { title: 'Identity' },
-      { title: 'Users', to: '/id/user' },
-      { title: form.value.id || 'Edit' },
+      { title: t('nav.home'), to: '/' },
+      { title: t('nav.identity') },
+      { title: t('user.title'), to: '/id/user' },
+      { title: form.value.id || t('user.edit') },
     ])
   } else {
-    appStore.setTitle('New User')
+    appStore.setTitle(t('user.new'))
     appStore.setBreadcrumbs([
-      { title: 'Home', to: '/' },
-      { title: 'Identity' },
-      { title: 'Users', to: '/id/user' },
-      { title: 'New' },
+      { title: t('nav.home'), to: '/' },
+      { title: t('nav.identity') },
+      { title: t('user.title'), to: '/id/user' },
+      { title: t('user.new') },
     ])
     // Check if API is available
     const check = await api.get('rest/service/id/user/admin')
@@ -193,7 +196,7 @@ async function save() {
   if (!valid) return
 
   if (demoMode.value) {
-    errorStore.push({ message: 'Demo mode — Connect an IAM plugin to save changes', status: 0 })
+    errorStore.push({ message: t('user.demoSave'), status: 0 })
     return
   }
 
@@ -217,7 +220,7 @@ async function save() {
 
 async function remove() {
   if (demoMode.value) {
-    errorStore.push({ message: 'Demo mode — Connect an IAM plugin to delete users', status: 0 })
+    errorStore.push({ message: t('user.demoDelete'), status: 0 })
     confirmDelete.value = false
     return
   }

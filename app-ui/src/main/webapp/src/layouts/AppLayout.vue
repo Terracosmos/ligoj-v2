@@ -13,18 +13,18 @@
         <v-list-item
           v-if="!item.children"
           :prepend-icon="item.icon"
-          :title="item.label"
+          :title="item.labelKey ? t(item.labelKey) : item.label"
           :to="item.route"
         />
         <v-list-group v-else :value="item.id">
           <template #activator="{ props }">
-            <v-list-item v-bind="props" :prepend-icon="item.icon" :title="item.label" />
+            <v-list-item v-bind="props" :prepend-icon="item.icon" :title="item.labelKey ? t(item.labelKey) : item.label" />
           </template>
           <v-list-item
             v-for="child in item.children"
             :key="child.id"
             :prepend-icon="child.icon"
-            :title="child.label"
+            :title="child.labelKey ? t(child.labelKey) : child.label"
             :to="child.route"
           />
         </v-list-group>
@@ -33,7 +33,7 @@
     <template #append>
       <v-divider />
       <v-list density="compact" nav>
-        <v-list-item prepend-icon="mdi-information-outline" title="About" to="/about" />
+        <v-list-item prepend-icon="mdi-information-outline" :title="t('nav.about')" to="/about" />
       </v-list>
     </template>
   </v-navigation-drawer>
@@ -42,13 +42,29 @@
     <v-app-bar-nav-icon @click="appStore.toggleSidebar()" />
     <v-toolbar-title>{{ appStore.title }}</v-toolbar-title>
     <v-spacer />
+    <v-menu>
+      <template #activator="{ props }">
+        <v-btn v-bind="props" icon size="small">
+          <v-icon>mdi-translate</v-icon>
+        </v-btn>
+      </template>
+      <v-list density="compact">
+        <v-list-item
+          v-for="loc in i18n.SUPPORTED_LOCALES"
+          :key="loc"
+          :title="LOCALE_NAMES[loc] || loc"
+          :active="i18n.locale === loc"
+          @click="i18n.setLocale(loc)"
+        />
+      </v-list>
+    </v-menu>
     <v-btn icon size="small" @click="toggleTheme">
       <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
     </v-btn>
     <v-btn variant="text" prepend-icon="mdi-account" @click="router.push('/profile')">
       {{ auth.userName }}
     </v-btn>
-    <v-btn icon @click="doLogout">
+    <v-btn icon @click="doLogout" :title="t('nav.logout')">
       <v-icon>mdi-logout</v-icon>
     </v-btn>
   </v-app-bar>
@@ -67,12 +83,17 @@ import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from 'vuetify'
 import { useAuthStore } from '@/stores/auth.js'
 import { useAppStore } from '@/stores/app.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const router = useRouter()
 const route = useRoute()
 const theme = useTheme()
 const auth = useAuthStore()
 const appStore = useAppStore()
+const i18n = useI18nStore()
+const t = i18n.t
+
+const LOCALE_NAMES = { en: 'English', fr: 'Français' }
 
 /** Auto-expand sidebar groups whose children match the current route */
 const openedGroups = computed(() => {

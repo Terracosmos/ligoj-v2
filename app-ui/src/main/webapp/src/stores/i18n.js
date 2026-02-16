@@ -1,9 +1,18 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import en from '@/i18n/en.js'
+import fr from '@/i18n/fr.js'
+
+const BUNDLES = { en, fr }
+const SUPPORTED_LOCALES = Object.keys(BUNDLES)
 
 export const useI18nStore = defineStore('i18n', () => {
-  const locale = ref(navigator.language?.substring(0, 2) || 'en')
-  const messages = ref({})
+  const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('ligoj-locale') : null
+  const browserLang = typeof navigator !== 'undefined' ? navigator.language?.substring(0, 2) : 'en'
+  const initial = saved || (SUPPORTED_LOCALES.includes(browserLang) ? browserLang : 'en')
+
+  const locale = ref(initial)
+  const messages = ref({ ...en, ...(BUNDLES[initial] || {}) })
   const loadedBundles = ref(new Set())
 
   const t = computed(() => {
@@ -25,7 +34,13 @@ export const useI18nStore = defineStore('i18n', () => {
   }
 
   function setLocale(loc) {
-    locale.value = loc
+    const target = SUPPORTED_LOCALES.includes(loc) ? loc : 'en'
+    locale.value = target
+    // Reload messages: start from English base, overlay target locale
+    messages.value = { ...en, ...(BUNDLES[target] || {}) }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('ligoj-locale', target)
+    }
   }
 
   function markLoaded(bundleId) {
@@ -36,5 +51,5 @@ export const useI18nStore = defineStore('i18n', () => {
     return loadedBundles.value.has(bundleId)
   }
 
-  return { locale, messages, t, merge, setLocale, markLoaded, isLoaded }
+  return { locale, messages, t, merge, setLocale, markLoaded, isLoaded, SUPPORTED_LOCALES }
 })

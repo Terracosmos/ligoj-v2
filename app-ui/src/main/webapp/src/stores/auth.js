@@ -6,25 +6,25 @@ import { ref, computed } from 'vue'
  */
 const NAV_CONFIG = [
   {
-    id: 'home', label: 'Home', icon: 'mdi-home', route: '/',
+    id: 'home', label: 'Home', labelKey: 'nav.home', icon: 'mdi-home', route: '/',
     auth: '^(home|$)',
   },
   {
-    id: 'id', label: 'Identity', icon: 'mdi-account-group', route: '/id',
+    id: 'id', label: 'Identity', labelKey: 'nav.identity', icon: 'mdi-account-group', route: '/id',
     auth: '^id',
     children: [
-      { id: 'id-user', label: 'Users', icon: 'mdi-account-multiple', route: '/id/user', auth: '^id/user' },
-      { id: 'id-group', label: 'Groups', icon: 'mdi-account-group-outline', route: '/id/group', auth: '^id/container/group' },
-      { id: 'id-company', label: 'Companies', icon: 'mdi-domain', route: '/id/company', auth: '^id/container/company' },
-      { id: 'id-delegate', label: 'Delegates', icon: 'mdi-account-switch', route: '/id/delegate', auth: '^id/delegate' },
+      { id: 'id-user', label: 'Users', labelKey: 'nav.users', icon: 'mdi-account-multiple', route: '/id/user', auth: '^id/user' },
+      { id: 'id-group', label: 'Groups', labelKey: 'nav.groups', icon: 'mdi-account-group-outline', route: '/id/group', auth: '^id/container/group' },
+      { id: 'id-company', label: 'Companies', labelKey: 'nav.companies', icon: 'mdi-domain', route: '/id/company', auth: '^id/container/company' },
+      { id: 'id-delegate', label: 'Delegates', labelKey: 'nav.delegates', icon: 'mdi-account-switch', route: '/id/delegate', auth: '^id/delegate' },
     ],
   },
   {
-    id: 'project', label: 'Projects', icon: 'mdi-folder-multiple', route: '/home/project',
+    id: 'project', label: 'Projects', labelKey: 'nav.projects', icon: 'mdi-folder-multiple', route: '/home/project',
     auth: '^home',
   },
   {
-    id: 'admin', label: 'Administration', icon: 'mdi-cog', route: '/admin',
+    id: 'admin', label: 'Administration', labelKey: 'nav.admin', icon: 'mdi-cog', route: '/admin',
     auth: '^api',
   },
 ]

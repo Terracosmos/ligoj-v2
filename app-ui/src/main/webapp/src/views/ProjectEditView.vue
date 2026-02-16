@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex align-center mb-4">
-      <h1 class="text-h4">{{ isEdit ? 'Edit Project' : 'New Project' }}</h1>
+      <h1 class="text-h4">{{ isEdit ? t('project.edit') : t('project.new') }}</h1>
     </div>
 
     <v-card :loading="loading" max-width="700">
@@ -9,32 +9,32 @@
         <v-form ref="formRef" @submit.prevent="save">
           <v-text-field
             v-model="form.name"
-            label="Name"
+            :label="t('project.name')"
             :rules="[rules.required]"
             variant="outlined"
             class="mb-2"
           />
           <v-text-field
             v-model="form.pkey"
-            label="Project Key"
+            :label="t('project.pkey')"
             :rules="[rules.required]"
             :disabled="isEdit"
-            :hint="isEdit ? '' : 'Unique identifier, cannot be changed after creation'"
+            :hint="isEdit ? '' : t('project.pkeyHint')"
             persistent-hint
             variant="outlined"
             class="mb-2"
           />
           <v-textarea
             v-model="form.description"
-            label="Description"
+            :label="t('project.description')"
             variant="outlined"
             rows="3"
             class="mb-2"
           />
           <v-text-field
             v-model="form.teamLeader"
-            label="Team Leader"
-            hint="User login ID (e.g. admin)"
+            :label="t('project.teamLeader')"
+            :hint="t('project.teamLeaderHint')"
             persistent-hint
             variant="outlined"
             class="mb-2"
@@ -43,26 +43,26 @@
       </v-card-text>
       <v-card-actions>
         <v-btn v-if="isEdit" color="error" variant="tonal" @click="confirmDelete = true">
-          <v-icon start>mdi-delete</v-icon> Delete
+          <v-icon start>mdi-delete</v-icon> {{ t('common.delete') }}
         </v-btn>
         <v-spacer />
-        <v-btn variant="text" @click="router.push('/home/project')">Cancel</v-btn>
+        <v-btn variant="text" @click="router.push('/home/project')">{{ t('common.cancel') }}</v-btn>
         <v-btn color="primary" variant="elevated" :loading="saving" @click="save">
-          <v-icon start>mdi-content-save</v-icon> Save
+          <v-icon start>mdi-content-save</v-icon> {{ t('common.save') }}
         </v-btn>
       </v-card-actions>
     </v-card>
 
     <v-dialog v-model="confirmDelete" max-width="400">
       <v-card>
-        <v-card-title>Delete Project</v-card-title>
+        <v-card-title>{{ t('project.deleteTitle') }}</v-card-title>
         <v-card-text>
-          Are you sure you want to delete <strong>{{ form.name }}</strong>? This action cannot be undone.
+          {{ t('project.deleteConfirm', { name: form.name }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="confirmDelete = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" :loading="deleting" @click="remove">Delete</v-btn>
+          <v-btn variant="text" @click="confirmDelete = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" :loading="deleting" @click="remove">{{ t('common.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -74,11 +74,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const route = useRoute()
 const router = useRouter()
 const api = useApi()
 const appStore = useAppStore()
+const i18n = useI18nStore()
+const t = i18n.t
 
 const formRef = ref(null)
 const loading = ref(false)
@@ -96,7 +99,7 @@ const form = ref({
 })
 
 const rules = {
-  required: v => !!v || 'This field is required',
+  required: v => !!v || t('common.required'),
 }
 
 onMounted(async () => {
@@ -110,18 +113,18 @@ onMounted(async () => {
       form.value.teamLeader = data.teamLeader?.id || ''
     }
     loading.value = false
-    appStore.setTitle('Edit Project')
+    appStore.setTitle(t('project.edit'))
     appStore.setBreadcrumbs([
-      { title: 'Home', to: '/' },
-      { title: 'Projects', to: '/home/project' },
-      { title: data?.name || 'Edit' },
+      { title: t('nav.home'), to: '/' },
+      { title: t('project.title'), to: '/home/project' },
+      { title: data?.name || t('common.edit') },
     ])
   } else {
-    appStore.setTitle('New Project')
+    appStore.setTitle(t('project.new'))
     appStore.setBreadcrumbs([
-      { title: 'Home', to: '/' },
-      { title: 'Projects', to: '/home/project' },
-      { title: 'New' },
+      { title: t('nav.home'), to: '/' },
+      { title: t('project.title'), to: '/home/project' },
+      { title: t('project.new') },
     ])
   }
 })

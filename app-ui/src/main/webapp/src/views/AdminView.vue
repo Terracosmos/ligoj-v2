@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-h4 mb-4">System Administration</h1>
+    <h1 class="text-h4 mb-4">{{ t('admin.title') }}</h1>
 
     <!-- System Health & Version -->
     <v-row class="mb-6">
@@ -9,7 +9,7 @@
           <v-card-text class="d-flex align-center">
             <v-icon :color="healthColor" size="48" class="mr-4">{{ healthIcon }}</v-icon>
             <div>
-              <div class="text-overline text-medium-emphasis">System Status</div>
+              <div class="text-overline text-medium-emphasis">{{ t('admin.health') }}</div>
               <div class="text-h5 font-weight-medium">{{ health.status || 'Unknown' }}</div>
             </div>
           </v-card-text>
@@ -20,7 +20,7 @@
           <v-card-text class="d-flex align-center">
             <v-icon color="primary" size="48" class="mr-4">mdi-information</v-icon>
             <div>
-              <div class="text-overline text-medium-emphasis">API Version</div>
+              <div class="text-overline text-medium-emphasis">{{ t('admin.version') }}</div>
               <div class="text-h5 font-weight-medium">{{ appVersion }}</div>
             </div>
           </v-card-text>
@@ -31,7 +31,7 @@
           <v-card-text class="d-flex align-center">
             <v-icon color="deep-purple" size="48" class="mr-4">mdi-puzzle</v-icon>
             <div>
-              <div class="text-overline text-medium-emphasis">Installed Plugins</div>
+              <div class="text-overline text-medium-emphasis">{{ t('admin.pluginCount') }}</div>
               <div class="text-h5 font-weight-medium">{{ plugins.length }}</div>
             </div>
           </v-card-text>
@@ -40,19 +40,19 @@
     </v-row>
 
     <!-- Plugins -->
-    <h2 class="text-h5 mb-3">Plugins</h2>
+    <h2 class="text-h5 mb-3">{{ t('admin.plugins') }}</h2>
     <v-card class="mb-6" :loading="loadingPlugins">
       <v-table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Key</th>
-            <th>Version</th>
-            <th>Type</th>
-            <th>Vendor</th>
-            <th>Nodes</th>
-            <th>Subscriptions</th>
-            <th>Status</th>
+            <th>{{ t('common.name') }}</th>
+            <th>{{ t('admin.key') }}</th>
+            <th>{{ t('admin.versionCol') }}</th>
+            <th>{{ t('admin.type') }}</th>
+            <th>{{ t('admin.vendor') }}</th>
+            <th>{{ t('admin.nodes') }}</th>
+            <th>{{ t('admin.subscriptions') }}</th>
+            <th>{{ t('common.status') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -68,25 +68,25 @@
             <td>{{ p.subscriptions }}</td>
             <td>
               <v-chip size="small" :color="p.deleted ? 'error' : 'success'">
-                {{ p.deleted ? 'Deleted' : 'Active' }}
+                {{ p.deleted ? t('common.deleted') : t('common.active') }}
               </v-chip>
             </td>
           </tr>
           <tr v-if="plugins.length === 0 && !loadingPlugins">
-            <td colspan="8" class="text-center text-medium-emphasis py-4">No plugins installed</td>
+            <td colspan="8" class="text-center text-medium-emphasis py-4">{{ t('admin.noPlugins') }}</td>
           </tr>
         </tbody>
       </v-table>
     </v-card>
 
     <!-- System Configuration (collapsible) -->
-    <h2 class="text-h5 mb-3">Configuration</h2>
+    <h2 class="text-h5 mb-3">{{ t('admin.config') }}</h2>
     <v-card :loading="loadingConfig">
       <v-card-text class="pa-0">
         <v-text-field
           v-model="configSearch"
           prepend-inner-icon="mdi-magnify"
-          label="Filter configuration"
+          :label="t('admin.configFilter')"
           variant="outlined"
           density="compact"
           hide-details
@@ -96,10 +96,10 @@
       <v-table density="compact" fixed-header height="400">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Value</th>
-            <th>Source</th>
-            <th>Persisted</th>
+            <th>{{ t('common.name') }}</th>
+            <th>{{ t('admin.value') }}</th>
+            <th>{{ t('admin.source') }}</th>
+            <th>{{ t('admin.persisted') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -117,7 +117,7 @@
             </td>
           </tr>
           <tr v-if="filteredConfig.length === 0 && !loadingConfig">
-            <td colspan="4" class="text-center text-medium-emphasis py-4">No configuration entries</td>
+            <td colspan="4" class="text-center text-medium-emphasis py-4">{{ t('admin.noConfig') }}</td>
           </tr>
         </tbody>
       </v-table>
@@ -130,10 +130,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
 import { useAuthStore } from '@/stores/auth.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const api = useApi()
 const appStore = useAppStore()
 const auth = useAuthStore()
+const i18n = useI18nStore()
+const t = i18n.t
 
 const loadingPlugins = ref(false)
 const loadingConfig = ref(false)
@@ -172,10 +175,10 @@ function typeColor(type) {
 }
 
 onMounted(async () => {
-  appStore.setTitle('Administration')
+  appStore.setTitle(t('admin.title'))
   appStore.setBreadcrumbs([
-    { title: 'Home', to: '/' },
-    { title: 'Administration' },
+    { title: t('nav.home'), to: '/' },
+    { title: t('nav.admin') },
   ])
 
   // Load plugins

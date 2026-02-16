@@ -5,10 +5,10 @@
       <v-chip v-if="project.pkey" class="ml-3" variant="outlined">{{ project.pkey }}</v-chip>
       <v-spacer />
       <v-btn variant="tonal" prepend-icon="mdi-pencil" class="mr-2" @click="router.push('/home/project/' + route.params.id + '/edit')">
-        Edit
+        {{ t('common.edit') }}
       </v-btn>
       <v-btn color="error" variant="tonal" prepend-icon="mdi-delete" @click="confirmDelete = true">
-        Delete
+        {{ t('common.delete') }}
       </v-btn>
     </div>
 
@@ -17,15 +17,15 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
-            <div class="text-caption text-medium-emphasis">Description</div>
+            <div class="text-caption text-medium-emphasis">{{ t('project.description') }}</div>
             <div>{{ project.description || '-' }}</div>
           </v-col>
           <v-col cols="12" md="3">
-            <div class="text-caption text-medium-emphasis">Team Leader</div>
+            <div class="text-caption text-medium-emphasis">{{ t('project.teamLeader') }}</div>
             <div>{{ project.teamLeader?.id || '-' }}</div>
           </v-col>
           <v-col cols="12" md="3">
-            <div class="text-caption text-medium-emphasis">Created</div>
+            <div class="text-caption text-medium-emphasis">{{ t('project.created') }}</div>
             <div>{{ formatDate(project.createdDate) }}</div>
           </v-col>
         </v-row>
@@ -34,7 +34,7 @@
 
     <!-- Subscriptions Section -->
     <div class="d-flex align-center mb-3">
-      <h2 class="text-h5">Subscriptions</h2>
+      <h2 class="text-h5">{{ t('subscription.title') }}</h2>
       <v-spacer />
       <v-btn
         color="primary"
@@ -42,16 +42,16 @@
         :disabled="availableNodes.length === 0"
         @click="addDialog = true"
       >
-        Add Subscription
+        {{ t('subscription.add') }}
       </v-btn>
     </div>
 
     <v-alert v-if="demoMode" type="info" variant="tonal" density="compact" class="mb-4">
-      Demo data — Install plugins (JIRA, Jenkins, SonarQube, etc.) to manage real subscriptions.
+      {{ t('subscription.demo') }}
     </v-alert>
 
     <v-alert v-if="!demoMode && subscriptions.length === 0 && !loading" type="info" variant="tonal" class="mb-4">
-      No subscriptions. Install plugins and add subscriptions to connect this project to your tools.
+      {{ t('subscription.empty') }}
     </v-alert>
 
     <v-row>
@@ -71,7 +71,7 @@
           <v-card-actions>
             <v-spacer />
             <v-btn size="small" variant="text" color="error" @click="startDeleteSub(sub)">
-              <v-icon size="small">mdi-delete</v-icon> Remove
+              <v-icon size="small">mdi-delete</v-icon> {{ t('common.remove') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -81,26 +81,26 @@
     <!-- Add Subscription Dialog -->
     <v-dialog v-model="addDialog" max-width="500">
       <v-card>
-        <v-card-title>Add Subscription</v-card-title>
+        <v-card-title>{{ t('subscription.add') }}</v-card-title>
         <v-card-text>
           <v-select
             v-model="newSub.node"
             :items="availableNodes"
             item-title="name"
             item-value="id"
-            label="Service / Tool"
+            :label="t('subscription.service')"
             variant="outlined"
             class="mb-3"
           />
           <v-alert v-if="demoMode" type="warning" variant="tonal" density="compact">
-            Demo mode — Install plugins to add real subscriptions.
+            {{ t('subscription.demoAdd') }}
           </v-alert>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="addDialog = false">Cancel</v-btn>
+          <v-btn variant="text" @click="addDialog = false">{{ t('common.cancel') }}</v-btn>
           <v-btn color="primary" variant="elevated" :disabled="!newSub.node || demoMode" @click="createSubscription">
-            Add
+            {{ t('common.add') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -109,14 +109,14 @@
     <!-- Delete Subscription Dialog -->
     <v-dialog v-model="deleteSubDialog" max-width="400">
       <v-card>
-        <v-card-title>Remove Subscription</v-card-title>
+        <v-card-title>{{ t('subscription.remove') }}</v-card-title>
         <v-card-text>
-          Remove <strong>{{ deleteSubTarget?.toolName }}</strong> from this project?
+          {{ t('subscription.removeConfirm', { name: deleteSubTarget?.toolName }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="deleteSubDialog = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" @click="deleteSubscription">Remove</v-btn>
+          <v-btn variant="text" @click="deleteSubDialog = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" @click="deleteSubscription">{{ t('common.remove') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -124,14 +124,14 @@
     <!-- Delete Project Dialog -->
     <v-dialog v-model="confirmDelete" max-width="400">
       <v-card>
-        <v-card-title>Delete Project</v-card-title>
+        <v-card-title>{{ t('project.deleteTitle') }}</v-card-title>
         <v-card-text>
-          Delete <strong>{{ project.name }}</strong> and all its subscriptions? This cannot be undone.
+          {{ t('project.deleteWithSubs', { name: project.name }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="confirmDelete = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" :loading="deleting" @click="deleteProject">Delete</v-btn>
+          <v-btn variant="text" @click="confirmDelete = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" :loading="deleting" @click="deleteProject">{{ t('common.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -143,11 +143,14 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const route = useRoute()
 const router = useRouter()
 const api = useApi()
 const appStore = useAppStore()
+const i18n = useI18nStore()
+const t = i18n.t
 
 const loading = ref(false)
 const deleting = ref(false)
@@ -214,11 +217,11 @@ onMounted(async () => {
   }
   loading.value = false
 
-  appStore.setTitle(project.value.name || 'Project')
+  appStore.setTitle(project.value.name || t('project.detail'))
   appStore.setBreadcrumbs([
-    { title: 'Home', to: '/' },
-    { title: 'Projects', to: '/home/project' },
-    { title: project.value.name || 'Detail' },
+    { title: t('nav.home'), to: '/' },
+    { title: t('project.title'), to: '/home/project' },
+    { title: project.value.name || t('project.detail') },
   ])
 })
 

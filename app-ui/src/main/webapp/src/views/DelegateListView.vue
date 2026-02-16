@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="d-flex align-center mb-4">
-      <h1 class="text-h4">Delegates</h1>
+      <h1 class="text-h4">{{ t('delegate.title') }}</h1>
       <v-spacer />
       <v-text-field
         v-model="dt.search.value"
         prepend-inner-icon="mdi-magnify"
-        label="Search"
+        :label="t('common.search')"
         variant="outlined"
         density="compact"
         hide-details
@@ -45,28 +45,32 @@
     </v-data-table-server>
 
     <v-alert v-if="!dt.loading.value && !dt.error.value && dt.totalItems.value === 0" type="info" variant="tonal" class="mt-4">
-      No delegates configured.
+      {{ t('delegate.empty') }}
     </v-alert>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useDataTable } from '@/composables/useDataTable.js'
 import { useAppStore } from '@/stores/app.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const appStore = useAppStore()
+const i18n = useI18nStore()
+const t = i18n.t
+
 const dt = useDataTable('security/delegate', { defaultSort: 'receiver' })
 const itemsPerPage = ref(25)
 let searchTimeout = null
 
-const headers = [
-  { title: 'Receiver', key: 'receiver', sortable: true },
-  { title: 'Type', key: 'type', sortable: false, width: '120px' },
-  { title: 'Resource', key: 'name', sortable: false },
-  { title: 'Admin', key: 'canAdmin', sortable: false, width: '80px' },
-  { title: 'Write', key: 'canWrite', sortable: false, width: '80px' },
-]
+const headers = computed(() => [
+  { title: t('delegate.receiver'), key: 'receiver', sortable: true },
+  { title: t('delegate.type'), key: 'type', sortable: false, width: '120px' },
+  { title: t('delegate.resource'), key: 'name', sortable: false },
+  { title: t('delegate.admin'), key: 'canAdmin', sortable: false, width: '80px' },
+  { title: t('delegate.write'), key: 'canWrite', sortable: false, width: '80px' },
+])
 
 function typeColor(type) {
   const colors = { USER: 'blue', GROUP: 'teal', COMPANY: 'indigo', TREE: 'orange' }
@@ -83,11 +87,11 @@ function onSearch() {
 }
 
 onMounted(() => {
-  appStore.setTitle('Delegates')
+  appStore.setTitle(t('delegate.title'))
   appStore.setBreadcrumbs([
-    { title: 'Home', to: '/' },
-    { title: 'Identity' },
-    { title: 'Delegates' },
+    { title: t('nav.home'), to: '/' },
+    { title: t('nav.identity') },
+    { title: t('delegate.title') },
   ])
 })
 </script>

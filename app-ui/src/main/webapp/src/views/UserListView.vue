@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="d-flex align-center mb-4">
-      <h1 class="text-h4">Users</h1>
+      <h1 class="text-h4">{{ t('user.title') }}</h1>
       <v-spacer />
       <v-text-field
         v-model="dt.search.value"
         prepend-inner-icon="mdi-magnify"
-        label="Search"
+        :label="t('common.search')"
         variant="outlined"
         density="compact"
         hide-details
@@ -14,17 +14,17 @@
         @update:model-value="onSearch"
       />
       <v-btn color="primary" prepend-icon="mdi-plus" @click="router.push('/id/user/new')">
-        New User
+        {{ t('user.new') }}
       </v-btn>
     </div>
 
     <v-alert v-if="dt.error.value" type="warning" variant="tonal" class="mb-4">
-      <v-alert-title>Identity provider not available</v-alert-title>
-      {{ dt.error.value === 'internal' ? 'No identity provider is configured. Connect an IAM plugin (LDAP, AD, etc.) to manage users.' : dt.error.value }}
+      <v-alert-title>{{ t('user.noProvider') }}</v-alert-title>
+      {{ dt.error.value === 'internal' ? t('user.noProviderMsg') : dt.error.value }}
     </v-alert>
 
     <v-alert v-if="dt.demoMode.value" type="info" variant="tonal" density="compact" class="mb-4">
-      Showing cached identity data. Connect an IAM plugin for live management.
+      {{ t('user.demoMode') }}
     </v-alert>
 
     <v-data-table-server
@@ -68,14 +68,14 @@
 
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
-        <v-card-title>Delete User</v-card-title>
+        <v-card-title>{{ t('user.deleteTitle') }}</v-card-title>
         <v-card-text>
-          Are you sure you want to delete <strong>{{ deleteTarget?.id }}</strong>?
+          {{ t('user.deleteConfirm', { id: deleteTarget?.id }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" :loading="deleting" @click="confirmDeleteUser">Delete</v-btn>
+          <v-btn variant="text" @click="deleteDialog = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" :loading="deleting" @click="confirmDeleteUser">{{ t('common.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -83,17 +83,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDataTable } from '@/composables/useDataTable.js'
 import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
 import { useErrorStore } from '@/stores/error.js'
+import { useI18nStore } from '@/stores/i18n.js'
 
 const router = useRouter()
 const appStore = useAppStore()
 const api = useApi()
 const errorStore = useErrorStore()
+const i18n = useI18nStore()
+const t = i18n.t
 const DEMO_USERS = [
   { id: 'admin', firstName: 'Admin', lastName: 'User', company: 'Ligoj', mails: ['admin@ligoj.org'], groups: [{ name: 'Engineering' }, { name: 'Management' }], locked: false },
   { id: 'jdupont', firstName: 'Jean', lastName: 'Dupont', company: 'Ligoj', mails: ['jean.dupont@ligoj.org'], groups: [{ name: 'Engineering' }, { name: 'DevOps' }], locked: false },
@@ -112,16 +115,16 @@ const deleteDialog = ref(false)
 const deleteTarget = ref(null)
 const deleting = ref(false)
 
-const headers = [
-  { title: 'Login', key: 'id', sortable: true },
-  { title: 'First Name', key: 'firstName', sortable: true },
-  { title: 'Last Name', key: 'lastName', sortable: true },
-  { title: 'Company', key: 'company', sortable: true },
-  { title: 'Email', key: 'mails', sortable: false },
-  { title: 'Groups', key: 'groups', sortable: false },
-  { title: 'Status', key: 'locked', sortable: false, width: '80px' },
+const headers = computed(() => [
+  { title: t('user.login'), key: 'id', sortable: true },
+  { title: t('user.firstName'), key: 'firstName', sortable: true },
+  { title: t('user.lastName'), key: 'lastName', sortable: true },
+  { title: t('user.company'), key: 'company', sortable: true },
+  { title: t('user.email'), key: 'mails', sortable: false },
+  { title: t('user.groups'), key: 'groups', sortable: false },
+  { title: t('common.status'), key: 'locked', sortable: false, width: '80px' },
   { title: '', key: 'actions', sortable: false, width: '100px', align: 'end' },
-]
+])
 
 function loadData(options) {
   dt.load(options)
@@ -139,7 +142,7 @@ function startDelete(item) {
 
 async function confirmDeleteUser() {
   if (dt.demoMode.value) {
-    errorStore.push({ message: 'Demo mode — Connect an IAM plugin to delete users', status: 0 })
+    errorStore.push({ message: t('user.demoDelete'), status: 0 })
     deleteDialog.value = false
     return
   }
@@ -152,11 +155,11 @@ async function confirmDeleteUser() {
 }
 
 onMounted(() => {
-  appStore.setTitle('Users')
+  appStore.setTitle(t('user.title'))
   appStore.setBreadcrumbs([
-    { title: 'Home', to: '/' },
-    { title: 'Identity' },
-    { title: 'Users' },
+    { title: t('nav.home'), to: '/' },
+    { title: t('nav.identity') },
+    { title: t('user.title') },
   ])
 })
 </script>
