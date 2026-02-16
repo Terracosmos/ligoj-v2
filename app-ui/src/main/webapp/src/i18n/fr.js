@@ -37,6 +37,12 @@ export default {
   'common.importSuccess': 'Import réussi',
   'common.importFail': 'Import échoué',
   'common.upload': 'Téléverser',
+  'common.selected': 'sélectionné(s)',
+  'common.bulkDeleteTitle': 'Supprimer les éléments sélectionnés',
+  'common.bulkDeleteConfirm': 'Supprimer {{count}} éléments ? Cette action est irréversible.',
+  'common.unsavedTitle': 'Modifications non sauvegardées',
+  'common.unsavedMsg': 'Vous avez des modifications non sauvegardées. Les abandonner ?',
+  'common.discard': 'Abandonner',
 
   // Dashboard
   'dashboard.welcome': 'Bienvenue, {{name}}',

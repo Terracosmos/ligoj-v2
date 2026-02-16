@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="appStore.sidebarOpen" app color="primary" dark>
+  <v-navigation-drawer v-model="appStore.sidebarOpen" :temporary="mobile" app color="primary" dark>
     <v-list-item @click="router.push('/')" class="pa-4">
       <template #prepend>
         <img src="@/assets/ligoj.svg" alt="Ligoj" style="width: 32px; height: 32px; margin-right: 8px" />
@@ -63,7 +63,7 @@
       <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
     </v-btn>
     <v-btn variant="text" prepend-icon="mdi-account" @click="router.push('/profile')">
-      {{ auth.userName }}
+      <span class="d-none d-sm-inline">{{ auth.userName }}</span>
     </v-btn>
     <v-btn icon @click="doLogout" :title="t('nav.logout')">
       <v-icon>mdi-logout</v-icon>
@@ -79,9 +79,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useTheme } from 'vuetify'
+import { useTheme, useDisplay } from 'vuetify'
 import { useAuthStore } from '@/stores/auth.js'
 import { useAppStore } from '@/stores/app.js'
 import { useI18nStore } from '@/stores/i18n.js'
@@ -90,6 +90,7 @@ import NotificationBell from '@/components/NotificationBell.vue'
 const router = useRouter()
 const route = useRoute()
 const theme = useTheme()
+const { mobile } = useDisplay()
 const auth = useAuthStore()
 const appStore = useAppStore()
 const i18n = useI18nStore()
@@ -105,6 +106,10 @@ const openedGroups = computed(() => {
 })
 
 const isDark = computed(() => theme.global.current.value.dark)
+
+watchEffect(() => {
+  if (mobile.value) appStore.sidebarOpen = false
+})
 
 function toggleTheme() {
   theme.global.name.value = isDark.value ? 'ligojLight' : 'ligojDark'

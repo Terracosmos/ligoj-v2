@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="d-flex align-center mb-4">
+    <div class="d-flex flex-wrap align-center mb-4 ga-2">
       <h1 class="text-h4">{{ t('delegate.title') }}</h1>
       <v-spacer />
       <v-text-field
@@ -10,7 +10,7 @@
         variant="outlined"
         density="compact"
         hide-details
-        class="search-field mr-3"
+        class="search-field"
         @update:model-value="onSearch"
       />
       <v-btn color="primary" prepend-icon="mdi-plus" @click="router.push('/id/delegate/new')">
@@ -22,13 +22,33 @@
       {{ dt.error.value }}
     </v-alert>
 
+    <v-slide-y-transition>
+      <v-toolbar v-if="selected.length" density="compact" color="primary" rounded class="mb-4">
+        <v-toolbar-title>{{ selected.length }} {{ t('common.selected') }}</v-toolbar-title>
+        <v-spacer />
+        <v-btn variant="elevated" color="error" prepend-icon="mdi-delete" @click="startBulkDelete">
+          {{ t('common.delete') }}
+        </v-btn>
+      </v-toolbar>
+    </v-slide-y-transition>
+
+    <v-skeleton-loader
+      v-if="dt.loading.value && dt.items.value.length === 0"
+      type="table-heading, table-row@5"
+      class="mb-4"
+    />
+
     <v-data-table-server
       v-if="!dt.error.value"
+      v-show="dt.items.value.length > 0 || !dt.loading.value"
+      v-model="selected"
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
       :items="dt.items.value"
       :items-length="dt.totalItems.value"
       :loading="dt.loading.value"
+      item-value="id"
+      show-select
       hover
       @update:options="loadData"
       @click:row="(_, { item }) => router.push('/id/delegate/' + item.id)"
@@ -74,6 +94,18 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="bulkDeleteDialog" max-width="400">
+      <v-card>
+        <v-card-title>{{ t('common.bulkDeleteTitle') }}</v-card-title>
+        <v-card-text>{{ t('common.bulkDeleteConfirm', { count: selected.length }) }}</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="bulkDeleteDialog = false">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="error" variant="elevated" :loading="deleting" @click="confirmBulkDelete">{{ t('common.delete') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -95,9 +127,11 @@ const dt = useDataTable('security/delegate', { defaultSort: 'receiver' })
 const itemsPerPage = ref(25)
 let searchTimeout = null
 
+const selected = ref([])
 const deleteDialog = ref(false)
 const deleteTarget = ref(null)
 const deleting = ref(false)
+const bulkDeleteDialog = ref(false)
 let lastOptions = {}
 
 const headers = computed(() => [
@@ -138,6 +172,21 @@ async function confirmDelete() {
   dt.load(lastOptions)
 }
 
+function startBulkDelete() {
+  bulkDeleteDialog.value = true
+}
+
+async function confirmBulkDelete() {
+  deleting.value = true
+  for (const id of selected.value) {
+    await api.del(`rest/security/delegate/${id}`)
+  }
+  deleting.value = false
+  bulkDeleteDialog.value = false
+  selected.value = []
+  dt.load(lastOptions)
+}
+
 onMounted(() => {
   appStore.setTitle(t('delegate.title'))
   appStore.setBreadcrumbs([
@@ -150,6 +199,8 @@ onMounted(() => {
 
 <style scoped>
 .search-field {
+  min-width: 200px;
   max-width: 300px;
+  flex: 1 1 200px;
 }
 </style>

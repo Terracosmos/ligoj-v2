@@ -12,8 +12,15 @@
       </v-btn>
     </div>
 
+    <v-skeleton-loader
+      v-if="loading"
+      type="card, heading, card@3"
+      class="mb-4"
+    />
+
+    <template v-if="!loading">
     <!-- Project Info Card -->
-    <v-card class="mb-6" :loading="loading">
+    <v-card class="mb-6">
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
@@ -77,6 +84,7 @@
         </v-card>
       </v-col>
     </v-row>
+    </template>
 
     <!-- Add Subscription Dialog -->
     <v-dialog v-model="addDialog" max-width="500">

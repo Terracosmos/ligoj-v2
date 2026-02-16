@@ -37,6 +37,12 @@ export default {
   'common.importSuccess': 'Import succeeded',
   'common.importFail': 'Import failed',
   'common.upload': 'Upload',
+  'common.selected': 'selected',
+  'common.bulkDeleteTitle': 'Delete selected items',
+  'common.bulkDeleteConfirm': 'Are you sure you want to delete {{count}} items? This cannot be undone.',
+  'common.unsavedTitle': 'Unsaved changes',
+  'common.unsavedMsg': 'You have unsaved changes. Discard them?',
+  'common.discard': 'Discard',
 
   // Dashboard
   'dashboard.welcome': 'Welcome, {{name}}',

@@ -4,7 +4,14 @@
       <h1 class="text-h4">{{ isEdit ? t('project.edit') : t('project.new') }}</h1>
     </div>
 
-    <v-card :loading="loading" max-width="700">
+    <v-skeleton-loader
+      v-if="loading"
+      type="card, actions"
+      max-width="700"
+      class="mb-4"
+    />
+
+    <v-card v-if="!loading" class="edit-card">
       <v-card-text>
         <v-form ref="formRef" @submit.prevent="save">
           <v-text-field
@@ -66,6 +73,18 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="showGuardDialog" max-width="400">
+      <v-card>
+        <v-card-title>{{ t('common.unsavedTitle') }}</v-card-title>
+        <v-card-text>{{ t('common.unsavedMsg') }}</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="cancelLeave">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="warning" variant="elevated" @click="confirmLeave">{{ t('common.discard') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -73,6 +92,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi.js'
+import { useFormGuard } from '@/composables/useFormGuard.js'
 import { useAppStore } from '@/stores/app.js'
 import { useI18nStore } from '@/stores/i18n.js'
 
@@ -97,6 +117,8 @@ const form = ref({
   description: '',
   teamLeader: '',
 })
+
+const { isDirty, showGuardDialog, confirmLeave, cancelLeave, markClean, init: initGuard } = useFormGuard(form)
 
 const rules = {
   required: v => !!v || t('common.required'),
@@ -127,6 +149,7 @@ onMounted(async () => {
       { title: t('project.new') },
     ])
   }
+  initGuard()
 })
 
 async function save() {
@@ -157,6 +180,7 @@ async function save() {
     }
   }
   saving.value = false
+  markClean()
   router.push('/home/project')
 }
 
@@ -165,6 +189,18 @@ async function remove() {
   await api.del(`rest/project/${route.params.id}`)
   deleting.value = false
   confirmDelete.value = false
+  markClean()
   router.push('/home/project')
 }
 </script>
+
+<style scoped>
+.edit-card {
+  max-width: 700px;
+}
+@media (max-width: 600px) {
+  .edit-card {
+    max-width: 100%;
+  }
+}
+</style>

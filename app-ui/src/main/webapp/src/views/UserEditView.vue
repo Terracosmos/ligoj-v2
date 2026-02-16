@@ -8,7 +8,14 @@
       {{ t('user.demoEdit') }}
     </v-alert>
 
-    <v-card :loading="loading" max-width="700">
+    <v-skeleton-loader
+      v-if="loading"
+      type="card, actions"
+      max-width="700"
+      class="mb-4"
+    />
+
+    <v-card v-if="!loading" class="edit-card">
       <v-card-text>
         <v-form ref="formRef" @submit.prevent="save">
           <v-text-field
@@ -83,6 +90,18 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="showGuardDialog" max-width="400">
+      <v-card>
+        <v-card-title>{{ t('common.unsavedTitle') }}</v-card-title>
+        <v-card-text>{{ t('common.unsavedMsg') }}</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="cancelLeave">{{ t('common.cancel') }}</v-btn>
+          <v-btn color="warning" variant="elevated" @click="confirmLeave">{{ t('common.discard') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -90,6 +109,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi.js'
+import { useFormGuard } from '@/composables/useFormGuard.js'
 import { useAppStore } from '@/stores/app.js'
 import { useErrorStore } from '@/stores/error.js'
 import { useI18nStore } from '@/stores/i18n.js'
@@ -120,6 +140,8 @@ const form = ref({
   company: '',
   mail: '',
 })
+
+const { isDirty, showGuardDialog, confirmLeave, cancelLeave, markClean, init: initGuard } = useFormGuard(form)
 
 const rules = {
   required: v => !!v || t('common.required'),
@@ -189,6 +211,7 @@ onMounted(async () => {
       errorStore.clear()
     }
   }
+  initGuard()
 })
 
 async function save() {
@@ -215,6 +238,7 @@ async function save() {
     await api.post('rest/service/id/user', payload)
   }
   saving.value = false
+  markClean()
   router.push('/id/user')
 }
 
@@ -229,6 +253,18 @@ async function remove() {
   await api.del(`rest/service/id/user/${route.params.id}`)
   deleting.value = false
   confirmDelete.value = false
+  markClean()
   router.push('/id/user')
 }
 </script>
+
+<style scoped>
+.edit-card {
+  max-width: 700px;
+}
+@media (max-width: 600px) {
+  .edit-card {
+    max-width: 100%;
+  }
+}
+</style>
