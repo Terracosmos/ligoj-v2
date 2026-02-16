@@ -1,10 +1,21 @@
 <template>
   <div>
     <v-progress-linear v-if="loading" indeterminate color="primary" />
-    <v-alert v-else-if="error" type="error" variant="tonal">
-      Failed to load plugin "{{ pluginKey }}": {{ error }}
+    <v-alert v-else-if="error" type="error" variant="tonal" class="mb-4">
+      Failed to load plugin: {{ error }}
     </v-alert>
     <component :is="pluginComponent" v-else-if="pluginComponent" />
+    <!-- 404 fallback when no plugin matches -->
+    <div v-else-if="notFound" class="d-flex flex-column align-center justify-center" style="min-height: 50vh">
+      <v-icon size="96" color="primary" class="mb-4">mdi-compass-outline</v-icon>
+      <h1 class="text-h4 mb-2">Page not found</h1>
+      <p class="text-subtitle-1 text-medium-emphasis mb-6">
+        The page <code>{{ route.path }}</code> does not exist or requires a plugin that is not installed.
+      </p>
+      <v-btn color="primary" variant="flat" prepend-icon="mdi-home" to="/">
+        Back to Dashboard
+      </v-btn>
+    </div>
   </div>
 </template>
 
@@ -15,41 +26,61 @@ import { useAppStore } from '@/stores/app.js'
 import { loadPlugin } from '@/plugins/loader.js'
 import registry from '@/plugins/registry.js'
 
-const props = defineProps({
-  pluginKey: { type: String, default: '' },
-})
-
 const route = useRoute()
 const appStore = useAppStore()
 
 const loading = ref(false)
 const error = ref(null)
+const notFound = ref(false)
 const pluginComponent = shallowRef(null)
 
-async function activate(key) {
-  const pluginId = key.split('/')[0]
-  if (!pluginId) return
+async function activate(path) {
+  // Extract potential plugin key from the route path
+  // e.g. /service/bt/jira → pluginKey = "service:bt:jira"
+  const segments = path.replace(/^\/+/, '').split('/')
+  if (!segments[0]) {
+    notFound.value = true
+    return
+  }
 
   loading.value = true
   error.value = null
+  notFound.value = false
   pluginComponent.value = null
+
+  // Try plugin ID formats: "service:bt:jira", "service:bt", "service"
+  const pluginId = segments.join(':')
 
   try {
     if (!registry.has(pluginId)) {
       await loadPlugin(pluginId)
     }
     const plugin = registry.get(pluginId)
-    pluginComponent.value = plugin?.component || null
-    appStore.setTitle(plugin?.label || pluginId)
-    appStore.currentPlugin = pluginId
-  } catch (e) {
-    error.value = e.message
+    if (plugin?.component) {
+      pluginComponent.value = plugin.component
+      appStore.setTitle(plugin.label || pluginId)
+      appStore.currentPlugin = pluginId
+    } else {
+      notFound.value = true
+      appStore.setTitle('Not Found')
+    }
+  } catch {
+    // Plugin doesn't exist — show 404
+    notFound.value = true
+    appStore.setTitle('Not Found')
+    appStore.setBreadcrumbs([
+      { title: 'Home', to: '/' },
+      { title: 'Not Found' },
+    ])
   } finally {
     loading.value = false
   }
 }
 
-watch(() => route.params.pluginKey, (key) => {
-  if (key) activate(key)
+watch(() => route.path, (path) => {
+  // Only activate on catch-all routes (not named routes)
+  if (route.name === 'not-found' || route.name === 'plugin') {
+    activate(path)
+  }
 }, { immediate: true })
 </script>

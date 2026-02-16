@@ -13,6 +13,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.js'
+import { loadAllPlugins } from '@/plugins/loader.js'
 import AppLayout from '@/layouts/AppLayout.vue'
 import ErrorSnackbar from '@/components/ErrorSnackbar.vue'
 
@@ -22,6 +23,12 @@ onMounted(async () => {
   const ok = await auth.fetchSession()
   if (!ok) {
     window.location.href = 'v-login.html'
+    return
+  }
+  // Load frontend plugins (silently ignores backend-only plugins without Vue UI)
+  const pluginIds = auth.appSettings?.plugins || []
+  if (pluginIds.length) {
+    loadAllPlugins(pluginIds)
   }
 })
 </script>

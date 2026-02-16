@@ -11,7 +11,8 @@ import ProjectDetailView from '@/views/ProjectDetailView.vue'
 import UserEditView from '@/views/UserEditView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import AboutView from '@/views/AboutView.vue'
-import SectionView from '@/views/SectionView.vue'
+import AdminView from '@/views/AdminView.vue'
+import PluginView from '@/views/PluginView.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -27,8 +28,9 @@ const routes = [
   { path: '/home/project/new', name: 'project-new', component: ProjectEditView },
   { path: '/home/project/:id', name: 'project-detail', component: ProjectDetailView },
   { path: '/home/project/:id/edit', name: 'project-edit', component: ProjectEditView },
-  // Catch-all for future routes
-  { path: '/:pathMatch(.*)*', name: 'not-found', component: SectionView },
+  { path: '/admin', name: 'admin', component: AdminView },
+  // Catch-all: tries to load a plugin, falls back to 404
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: PluginView },
 ]
 
 const router = createRouter({

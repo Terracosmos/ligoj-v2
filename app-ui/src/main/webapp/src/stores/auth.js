@@ -23,6 +23,10 @@ const NAV_CONFIG = [
     id: 'project', label: 'Projects', icon: 'mdi-folder-multiple', route: '/home/project',
     auth: '^home',
   },
+  {
+    id: 'admin', label: 'Administration', icon: 'mdi-cog', route: '/admin',
+    auth: '^api',
+  },
 ]
 
 export const useAuthStore = defineStore('auth', () => {
