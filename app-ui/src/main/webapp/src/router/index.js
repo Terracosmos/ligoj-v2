@@ -7,6 +7,7 @@ import CompanyListView from '@/views/CompanyListView.vue'
 import DelegateListView from '@/views/DelegateListView.vue'
 import ProjectListView from '@/views/ProjectListView.vue'
 import ProjectEditView from '@/views/ProjectEditView.vue'
+import UserEditView from '@/views/UserEditView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import AboutView from '@/views/AboutView.vue'
 import SectionView from '@/views/SectionView.vue'
@@ -16,6 +17,8 @@ const routes = [
   { path: '/profile', name: 'profile', component: ProfileView },
   { path: '/about', name: 'about', component: AboutView },
   { path: '/id/user', name: 'id-user', component: UserListView },
+  { path: '/id/user/new', name: 'id-user-new', component: UserEditView },
+  { path: '/id/user/:id', name: 'id-user-edit', component: UserEditView },
   { path: '/id/group', name: 'id-group', component: GroupListView },
   { path: '/id/company', name: 'id-company', component: CompanyListView },
   { path: '/id/delegate', name: 'id-delegate', component: DelegateListView },
