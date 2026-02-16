@@ -16,6 +16,12 @@
       <v-btn color="primary" prepend-icon="mdi-plus" @click="router.push('/id/user/new')">
         {{ t('user.new') }}
       </v-btn>
+      <ImportExportBar
+        export-endpoint="service/id/user"
+        import-endpoint="service/id/user/import/csv/full"
+        export-filename="users.csv"
+        @imported="dt.load({ page: 1, itemsPerPage: itemsPerPage.value })"
+      />
     </div>
 
     <v-alert v-if="dt.error.value" type="warning" variant="tonal" class="mb-4">
@@ -90,6 +96,7 @@ import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
 import { useErrorStore } from '@/stores/error.js'
 import { useI18nStore } from '@/stores/i18n.js'
+import ImportExportBar from '@/components/ImportExportBar.vue'
 
 const router = useRouter()
 const appStore = useAppStore()

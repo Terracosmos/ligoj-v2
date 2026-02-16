@@ -16,6 +16,11 @@
       <v-btn color="primary" prepend-icon="mdi-plus" @click="router.push('/home/project/new')">
         {{ t('project.new') }}
       </v-btn>
+      <ImportExportBar
+        export-endpoint="project"
+        export-filename="projects.csv"
+        @imported="dt.load(lastOptions)"
+      />
     </div>
 
     <v-alert v-if="dt.error.value" type="warning" variant="tonal" class="mb-4">
@@ -73,6 +78,7 @@ import { useDataTable } from '@/composables/useDataTable.js'
 import { useApi } from '@/composables/useApi.js'
 import { useAppStore } from '@/stores/app.js'
 import { useI18nStore } from '@/stores/i18n.js'
+import ImportExportBar from '@/components/ImportExportBar.vue'
 
 const router = useRouter()
 const appStore = useAppStore()

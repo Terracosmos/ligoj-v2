@@ -32,6 +32,11 @@ export default {
   'common.deleted': 'Supprimé',
   'common.unknown': 'Inconnu',
   'common.backHome': 'Retour au tableau de bord',
+  'common.export': 'Exporter',
+  'common.import': 'Importer',
+  'common.importSuccess': 'Import réussi',
+  'common.importFail': 'Import échoué',
+  'common.upload': 'Téléverser',
 
   // Dashboard
   'dashboard.welcome': 'Bienvenue, {{name}}',
