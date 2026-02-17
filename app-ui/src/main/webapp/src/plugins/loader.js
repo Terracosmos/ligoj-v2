@@ -7,6 +7,11 @@ const loaded = new Set()
 export async function loadPlugin(pluginId) {
   if (loaded.has(pluginId)) return registry.get(pluginId)
 
+  if (registry.has(pluginId)) {
+    loaded.add(pluginId)
+    return registry.get(pluginId)
+  }
+
   const url = `/webjars/${pluginId}/vue/index.js`
 
   try {

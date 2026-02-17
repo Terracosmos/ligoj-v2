@@ -249,4 +249,98 @@ export default {
   // Group parent
   'group.parent': 'Groupe parent',
   'group.parentHint': 'Groupe parent optionnel pour la hiérarchie',
+
+  // Plugin: SCM / Git
+  'service.scm': 'Gestion de sources',
+  'service.scm.git': 'Git',
+  'service.scm.git.url': 'URL du dépôt',
+  'service.scm.git.repository': 'Dépôt',
+
+  // Plugin: KM / Confluence
+  'service.km': 'Connaissance',
+  'service.km.confluence': 'Confluence',
+  'service.km.confluence.space': 'Espace',
+  'service.km.confluence.url': 'URL',
+  'service.km.confluence.spaces': 'Espaces Confluence',
+  'service.km.confluence.activity': 'Dernière activité',
+  'service.km.confluence.authWarning': 'Vous devez être authentifié sur Confluence pour voir les espaces.',
+  'service.km.confluence.login': 'S\'authentifier',
+  'service.km.confluence.refresh': 'Recharger',
+
+  // Plugin: Build / Jenkins
+  'service.build': 'Construction',
+  'service.build.jenkins': 'Jenkins',
+  'service.build.jenkins.job': 'Tâche',
+  'service.build.jenkins.build': 'Construire',
+  'service.build.jenkins.building': 'En construction...',
+  'service.build.jenkins.branches': 'Branches',
+  'service.build.jenkins.success': 'Succès',
+  'service.build.jenkins.unstable': 'Instable',
+  'service.build.jenkins.failure': 'Échec',
+  'service.build.jenkins.disabled': 'Désactivé',
+  'service.build.jenkins.buildTriggered': 'Construction lancée avec succès',
+
+  // Plugin: Bug Tracker / SLA
+  'service.bt': 'Anomalies',
+  'service.bt.sla': 'SLA',
+  'service.bt.sla.name': 'Nom',
+  'service.bt.sla.start': 'Démarrage',
+  'service.bt.sla.stop': 'Arrêt',
+  'service.bt.sla.pause': 'Pause',
+  'service.bt.sla.threshold': 'Seuil',
+  'service.bt.sla.priority': 'Priorité',
+  'service.bt.businessHours': 'Heures ouvrées',
+
+  // Plugin: Bug Tracker / JIRA
+  'service.bt.jira': 'JIRA',
+  'service.bt.jira.project': 'Projet JIRA',
+  'service.bt.jira.issues': 'Anomalies par priorité',
+  'service.bt.jira.import': 'Importer CSV',
+  'service.bt.jira.importMode': 'Mode d\'import',
+  'service.bt.jira.encoding': 'Encodage',
+  'service.bt.jira.importSuccess': 'Import terminé avec succès',
+  'service.bt.jira.importFailed': 'Import échoué',
+
+  // Plugin: VM
+  'service.vm': 'Machines virtuelles',
+  'service.vm.status': 'Statut',
+  'service.vm.poweredOn': 'Allumée',
+  'service.vm.poweredOff': 'Éteinte',
+  'service.vm.suspended': 'Suspendue',
+  'service.vm.on': 'Démarrer',
+  'service.vm.off': 'Éteindre',
+  'service.vm.suspend': 'Suspendre',
+  'service.vm.shutdown': 'Arrêter',
+  'service.vm.reset': 'Réinitialiser',
+  'service.vm.reboot': 'Redémarrer',
+  'service.vm.schedules': 'Planification',
+  'service.vm.snapshots': 'Instantanés',
+  'service.vm.cron': 'Expression CRON',
+  'service.vm.createSnapshot': 'Créer un instantané',
+
+  // Plugin: Inbox / Messaging
+  'inbox.title': 'Messages',
+  'inbox.new': 'Nouveau message',
+  'inbox.noMessages': 'Aucun message',
+  'inbox.from': 'De',
+  'inbox.to': 'À',
+  'inbox.message': 'Message',
+  'inbox.send': 'Envoyer',
+  'inbox.targetType': 'Type de destinataire',
+  'inbox.target': 'Destinataire',
+  'inbox.audience': 'Audience',
+  'inbox.noEditDelete': 'Les messages ne peuvent pas être modifiés ou supprimés après envoi.',
+  'inbox.loadMore': 'Charger plus',
+  'inbox.user': 'Utilisateur',
+  'inbox.group': 'Groupe',
+  'inbox.company': 'Entité',
+  'inbox.project': 'Projet',
+  'inbox.node': 'Outil',
+
+  // Common additions for plugins
+  'common.open': 'Ouvrir',
+  'common.copy': 'Copier',
+  'common.copied': 'Copié !',
+  'common.operation': 'Opération',
+  'common.trigger': 'Déclencher',
 }
