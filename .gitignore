@@ -21,5 +21,4 @@ bin/
 /app-api/settings.xml
 app-ui/node_modules/
 app-ui/src/main/webapp/node_modules/
-app-ui/src/main/webapp/package-lock.json
 app-ui/src/main/webapp/src/main/resources/static/
