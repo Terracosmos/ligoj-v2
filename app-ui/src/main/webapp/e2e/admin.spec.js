@@ -3,7 +3,6 @@ import { test, expect } from '@playwright/test'
 test.describe('Admin page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('v-index.html#/admin')
-    await page.waitForLoadState('networkidle')
     await page.locator('.v-application').waitFor({ timeout: 15000 })
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/admin/i, { timeout: 15000 })
   })

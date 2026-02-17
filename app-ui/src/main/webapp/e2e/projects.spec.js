@@ -15,7 +15,9 @@ test.describe('Projects CRUD', () => {
   test('shows data table or empty state', async ({ page }) => {
     const dataTable = page.locator('.v-data-table-server, .v-data-table')
     const emptyText = page.getByText(/no projects|aucun projet/i)
-    await expect(dataTable.or(emptyText)).toBeVisible({ timeout: 10000 })
+    const hasTable = await dataTable.isVisible().catch(() => false)
+    const hasEmpty = await emptyText.isVisible().catch(() => false)
+    expect(hasTable || hasEmpty).toBeTruthy()
   })
 
   test('has new project button', async ({ page }) => {
