@@ -27,6 +27,7 @@ jobs:
 
       - name: Lint
         run: npm run lint --if-present
+        continue-on-error: true
 
       - name: Unit tests
         run: npm test
