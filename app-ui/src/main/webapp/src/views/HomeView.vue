@@ -46,7 +46,9 @@ const CARD_META = computed(() => ({
   'id-group': { color: 'teal', subtitle: t('dashboard.manageGroups') },
   'id-company': { color: 'indigo', subtitle: t('dashboard.manageCompanies') },
   'id-delegate': { color: 'purple', subtitle: t('dashboard.manageDelegates') },
+  'id-container-scope': { color: 'cyan', subtitle: t('dashboard.manageContainerScopes') },
   'project': { color: 'orange', subtitle: t('dashboard.manageProjects') },
+  'admin': { color: 'red', subtitle: t('dashboard.manageAdmin') },
 }))
 
 /** Flatten nav items into dashboard cards */

@@ -51,7 +51,9 @@ export default {
   'dashboard.manageGroups': 'Gérer les groupes',
   'dashboard.manageCompanies': 'Gérer les entités',
   'dashboard.manageDelegates': 'Gérer les délégations',
+  'dashboard.manageContainerScopes': 'Gérer les portées de conteneurs',
   'dashboard.manageProjects': 'Gérer les projets et souscriptions',
+  'dashboard.manageAdmin': 'Administration système',
 
   // Projects
   'project.title': 'Projets',
