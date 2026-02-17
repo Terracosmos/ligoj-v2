@@ -15,6 +15,10 @@ export const useI18nStore = defineStore('i18n', () => {
   const messages = ref({ ...en, ...(BUNDLES[initial] || {}) })
   const loadedBundles = ref(new Set())
 
+  function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  }
+
   const t = computed(() => {
     const msgs = messages.value
     return (key, params) => {
@@ -22,7 +26,7 @@ export const useI18nStore = defineStore('i18n', () => {
       if (val === undefined) return key
       if (params) {
         Object.entries(params).forEach(([k, v]) => {
-          val = val.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), v)
+          val = val.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), escapeHtml(v))
         })
       }
       return val

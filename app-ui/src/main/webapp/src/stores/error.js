@@ -30,7 +30,15 @@ export const useErrorStore = defineStore('error', () => {
 
     const redirect = response.headers.get('x-redirect')
     if (redirect) {
-      window.location.href = redirect
+      // Only allow same-origin redirects to prevent open redirect attacks
+      try {
+        const url = new URL(redirect, window.location.origin)
+        if (url.origin === window.location.origin) {
+          window.location.href = url.href
+        }
+      } catch {
+        // Invalid URL — ignore redirect
+      }
       return response
     }
 

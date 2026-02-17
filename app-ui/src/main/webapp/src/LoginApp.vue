@@ -10,13 +10,13 @@
 
         <v-card-text>
           <v-alert v-if="infoMsg" type="info" variant="tonal" density="compact" class="mb-4">
-            <span v-html="infoMsg" />
+            {{ infoMsg }}
           </v-alert>
           <v-alert v-if="successMsg" type="success" variant="tonal" density="compact" class="mb-4">
             {{ successMsg }}
           </v-alert>
           <v-alert v-if="errorMsg" type="error" variant="tonal" density="compact" class="mb-4" data-test="error-alert">
-            <span v-html="errorMsg" />
+            {{ errorMsg }}
           </v-alert>
 
           <v-form ref="formRef" @submit.prevent="submit">
@@ -267,7 +267,7 @@ function switchMode(newMode) {
   }
   // Update URL hash
   if (newMode === 'recovery') {
-    window.location.hash = '#recovery' + (username.value ? '=' + username.value : '')
+    window.location.hash = '#recovery' + (username.value ? '=' + encodeURIComponent(username.value) : '')
   } else if (newMode === 'login') {
     window.location.hash = ''
   }
@@ -319,7 +319,7 @@ async function doLogin() {
 }
 
 async function doReset() {
-  const resp = await fetch('rest/service/password/reset/' + username.value.toLowerCase(), {
+  const resp = await fetch('rest/service/password/reset/' + encodeURIComponent(username.value.toLowerCase()), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -338,7 +338,7 @@ async function doReset() {
 }
 
 async function doRecovery() {
-  const resp = await fetch('rest/service/password/recovery/' + username.value.toLowerCase() + '/' + mail.value.toLowerCase(), {
+  const resp = await fetch('rest/service/password/recovery/' + encodeURIComponent(username.value.toLowerCase()) + '/' + encodeURIComponent(mail.value.toLowerCase()), {
     method: 'POST',
     headers: { 'captcha': captcha.value },
     credentials: 'include',

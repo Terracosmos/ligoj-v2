@@ -12,8 +12,15 @@ function parseDefineBlock(text) {
   const match = text.match(/define\s*\(\s*(\{[\s\S]*\})\s*\)/)
   if (!match) return null
   try {
-    // Use Function constructor to evaluate the object literal safely
-    return new Function(`return (${match[1]})`)()
+    // Convert JS object literal to valid JSON:
+    // - Quote unquoted keys
+    // - Replace single quotes with double quotes
+    // - Remove trailing commas before } or ]
+    const json = match[1]
+      .replace(/'/g, '"')
+      .replace(/,\s*([}\]])/g, '$1')
+      .replace(/(\{|,)\s*([a-zA-Z_$][\w$]*)\s*:/g, '$1"$2":')
+    return JSON.parse(json)
   } catch {
     return null
   }

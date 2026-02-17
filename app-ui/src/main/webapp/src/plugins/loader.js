@@ -12,6 +12,11 @@ export async function loadPlugin(pluginId) {
     return registry.get(pluginId)
   }
 
+  // Validate plugin ID to prevent path traversal
+  if (!/^[a-zA-Z0-9][\w-]*$/.test(pluginId)) {
+    throw new Error(`Invalid plugin ID: "${pluginId}"`)
+  }
+
   const url = `/webjars/${pluginId}/vue/index.js`
 
   try {
