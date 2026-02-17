@@ -15,7 +15,7 @@
           <v-alert v-if="successMsg" type="success" variant="tonal" density="compact" class="mb-4">
             {{ successMsg }}
           </v-alert>
-          <v-alert v-if="errorMsg" type="error" variant="tonal" density="compact" class="mb-4">
+          <v-alert v-if="errorMsg" type="error" variant="tonal" density="compact" class="mb-4" data-test="error-alert">
             <span v-html="errorMsg" />
           </v-alert>
 
@@ -32,6 +32,7 @@
               :readonly="mode === 'reset'"
               :rules="mode !== 'reset' ? [rules.required] : []"
               class="mb-2"
+              data-test="username"
             />
 
             <!-- Password (login + reset) -->
@@ -49,6 +50,7 @@
               :hint="mode === 'reset' ? msg.helpPassword : ''"
               persistent-hint
               class="mb-2"
+              data-test="password"
             />
 
             <!-- Confirm Password (reset only) -->
@@ -108,6 +110,7 @@
               size="large"
               block
               :loading="loading"
+              data-test="submit"
             >{{ msg['submit-' + mode] }}</v-btn>
           </v-form>
 
