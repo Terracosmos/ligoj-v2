@@ -29,6 +29,12 @@ export default defineConfig({
         login: resolve(__dirname, 'v-login.html'),
       },
       external: [/^\/main\//, /^\/ligoj\/main\//],
+      output: {
+        manualChunks: {
+          vuetify: ['vuetify'],
+          vendor: ['vue', 'vue-router', 'pinia'],
+        },
+      },
     },
     outDir: resolve(__dirname, '../../../target/classes/META-INF/resources/webjars/vue-dist'),
     emptyOutDir: true,
