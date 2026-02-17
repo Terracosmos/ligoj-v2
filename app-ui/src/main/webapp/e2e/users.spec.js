@@ -44,9 +44,11 @@ test.describe('Users CRUD', () => {
   })
 
   test('clicking a user row navigates to edit form', async ({ page }) => {
-    const row = page.locator('.v-data-table tbody tr').first()
-    if (await row.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await row.click()
+    // Only run if there are actual data rows (not the "no data" row)
+    const dataRows = page.locator('.v-data-table tbody tr:not(:has-text("No data"))')
+    const count = await dataRows.count()
+    if (count > 0) {
+      await dataRows.first().click()
       await page.waitForURL('**#/id/user/**')
       await expect(page.getByRole('heading', { level: 1 })).toContainText(/edit|modifier/i)
     }
