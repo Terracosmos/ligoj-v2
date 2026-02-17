@@ -42,20 +42,24 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/rest': {
-        target: 'http://localhost:8081',
-        changeOrigin: true,
-      },
-      '/webjars': {
-        target: 'http://localhost:8081',
-        changeOrigin: true,
-      },
       '/ligoj/rest': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/ligoj/login': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/ligoj/logout': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/ligoj/captcha.png': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
       '/ligoj/webjars': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },
