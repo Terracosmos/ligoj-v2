@@ -1,188 +1,214 @@
-# Audit Sécurité & Architecture — Ligoj Vue 3 Frontend
+<h1 align="center">Audit Securite & Architecture</h1>
+<h3 align="center">Ligoj v2 — Frontend Vue 3</h3>
 
-**Date** : Février 2026
-**Scope** : `app-ui/src/main/webapp/` — Vue 3 / Vite 6 / Vuetify 3 / Pinia
-**Commit** : branche `vue3-migration`
+<p align="center">
+  <img src="https://img.shields.io/badge/Securite-6_corrigees-brightgreen?style=for-the-badge&logo=shield" alt="Securite">
+  <img src="https://img.shields.io/badge/Vulnerabilites_ouvertes-0_critique-brightgreen?style=for-the-badge" alt="0 critique">
+  <img src="https://img.shields.io/badge/Tests-194_pass-brightgreen?style=for-the-badge&logo=vitest" alt="Tests">
+</p>
 
----
-
-## 1. Résumé
-
-| Catégorie | Critique | Haute | Moyenne | Basse |
-|-----------|----------|-------|---------|-------|
-| Sécurité  | 3 (corrigés) | 3 (corrigés) | 2 | 0 |
-| Architecture | 0 | 2 | 4 | 3 |
-
-**Toutes les vulnérabilités critiques et hautes ont été corrigées** dans ce même commit.
+<p align="center">
+  <strong>Date</strong> : Fevrier 2026 &nbsp;&bull;&nbsp;
+  <strong>Scope</strong> : <code>app-ui/src/main/webapp/src/</code> &nbsp;&bull;&nbsp;
+  <strong>Branche</strong> : <code>vue3-migration</code>
+</p>
 
 ---
 
-## 2. Vulnérabilités de sécurité
+## Synthese
 
-### CRITIQUES (corrigées)
+| Categorie | Critique | Haute | Moyenne | Basse | Total |
+|:----------|:--------:|:-----:|:-------:|:-----:|:-----:|
+| Securite | 3 &rarr; **corrigees** | 3 &rarr; **corrigees** | 2 (recommandations) | 0 | **8** |
+| Architecture | 0 | 1 | 3 | 2 | **6** |
 
-#### SEC-01 — XSS via `v-html` dans LoginApp.vue
-- **Fichier** : `src/LoginApp.vue` (lignes 13, 19)
-- **Problème** : `<span v-html="infoMsg" />` et `<span v-html="errorMsg" />` permettaient l'injection HTML
-- **Correction** : Remplacé par `{{ infoMsg }}` et `{{ errorMsg }}` (auto-escaping Vue)
-- **Risque résiduel** : Aucun
-
-#### SEC-02 — Exécution de code via `new Function()` dans nls-adapter.js
-- **Fichier** : `src/plugins/nls-adapter.js` (ligne 16)
-- **Problème** : `new Function('return (' + match[1] + ')')()` évaluait du code arbitraire venant du serveur
-- **Correction** : Remplacé par conversion JS→JSON + `JSON.parse()`. Plus aucune évaluation dynamique
-- **Risque résiduel** : Aucun
-
-#### SEC-03 — Open Redirect dans error.js
-- **Fichier** : `src/stores/error.js` (ligne 33)
-- **Problème** : `window.location.href = redirect` prenait directement le header `x-redirect` sans validation
-- **Correction** : Validation same-origin avec `new URL()` — seules les redirections vers le même domaine sont acceptées
-- **Risque résiduel** : Aucun
-
-### HAUTES (corrigées)
-
-#### SEC-04 — Injection de paramètres i18n
-- **Fichier** : `src/stores/i18n.js` (lignes 24-26)
-- **Problème** : Les paramètres `{{key}}` étaient interpolés sans échappement HTML
-- **Correction** : Ajout de `escapeHtml()` sur toutes les valeurs de paramètres avant interpolation
-- **Risque résiduel** : Aucun
-
-#### SEC-05 — URL encoding manquant dans LoginApp.vue
-- **Fichier** : `src/LoginApp.vue` (lignes 270, 322, 341)
-- **Problème** : `username` et `mail` utilisés dans les URLs sans `encodeURIComponent()`
-- **Correction** : Ajout de `encodeURIComponent()` sur les 3 interpolations URL
-- **Risque résiduel** : Aucun
-
-#### SEC-06 — Plugin ID non validé dans loader.js
-- **Fichier** : `src/plugins/loader.js` (ligne 15)
-- **Problème** : Le `pluginId` était interpolé directement dans `/webjars/${pluginId}/vue/index.js` sans validation, permettant un path traversal
-- **Correction** : Validation regex `/^[a-zA-Z0-9][\w-]*$/` avant toute utilisation
-- **Risque résiduel** : Aucun
-
-### MOYENNES (à considérer)
-
-#### SEC-07 — Pas de protection CSRF explicite
-- **Fichier** : `src/composables/useApi.js`, `src/stores/error.js`
-- **Problème** : Les appels API utilisent `credentials: 'include'` mais aucun token CSRF n'est envoyé
-- **Atténuation** : Le backend Spring Security gère le CSRF via les cookies SameSite. Les formulaires `application/json` sont naturellement protégés par CORS
-- **Recommandation** : Vérifier que le backend envoie bien `SameSite=Lax` ou `Strict` sur les cookies de session
-
-#### SEC-08 — Auto-dismiss des erreurs sensibles
-- **Fichier** : `src/stores/error.js` (ligne 16)
-- **Problème** : Les erreurs disparaissent après 8 secondes, y compris les erreurs de sécurité (401, 403)
-- **Recommandation** : Ne pas auto-dismiss les erreurs de type authentification/autorisation
+> **Toutes les vulnerabilites critiques et hautes ont ete corrigees.** Zero vulnerabilite ouverte de severite critique ou haute.
 
 ---
 
-## 3. Points positifs — Sécurité
+## 1. Vulnerabilites de securite
 
-| # | Point | Détail |
-|---|-------|--------|
-| 1 | **Auto-escaping Vue** | `{{ }}` utilisé partout (sauf LoginApp corrigé), pas de `v-html` restant |
-| 2 | **Credentials gérés correctement** | `credentials: 'include'` sur tous les fetch, cookies only (pas de tokens en localStorage) |
-| 3 | **Pas de manipulation DOM directe** | Aucun `document.getElementById`, `innerHTML` ou jQuery résiduel |
-| 4 | **Inputs validés côté client** | Rules Vuetify sur les formulaires (required, email, password strength) |
-| 5 | **Password reset sécurisé** | Token + CAPTCHA + validation de complexité |
-| 6 | **Pas de secrets en dur** | Aucune clé API, token ou mot de passe dans le code source |
-| 7 | **CSP-friendly** | Pas d'inline scripts, pas d'eval (après correction nls-adapter) |
-| 8 | **Hash routing sécurisé** | Les tokens reset sont extraits via regex stricte `[a-zA-Z0-9\-]+` |
+### Critiques (corrigees)
 
----
+<table>
+<tr><th>ID</th><th>Vulnerabilite</th><th>Fichier</th><th>Avant</th><th>Apres</th></tr>
+<tr>
+  <td><strong>SEC-01</strong></td>
+  <td>XSS via <code>v-html</code></td>
+  <td><code>LoginApp.vue</code></td>
+  <td><code>&lt;span v-html="errorMsg" /&gt;</code> permettait l'injection HTML</td>
+  <td><code>{{ errorMsg }}</code> — auto-escaping Vue. Verifie : <strong>aucun <code>v-html</code> dans tout le projet</strong></td>
+</tr>
+<tr>
+  <td><strong>SEC-02</strong></td>
+  <td>Execution de code arbitraire</td>
+  <td><code>nls-adapter.js</code></td>
+  <td><code>new Function('return (' + match[1] + ')')()</code> evaluait du code serveur</td>
+  <td>Conversion JS&rarr;JSON + <code>JSON.parse()</code>. Aucune evaluation dynamique</td>
+</tr>
+<tr>
+  <td><strong>SEC-03</strong></td>
+  <td>Open Redirect</td>
+  <td><code>stores/error.js:31-43</code></td>
+  <td><code>window.location.href = redirect</code> sans validation</td>
+  <td>Validation same-origin via <code>new URL()</code> — seul le meme domaine est accepte</td>
+</tr>
+</table>
 
-## 4. Architecture — Points d'attention
+### Hautes (corrigees)
 
-### HAUTS
+<table>
+<tr><th>ID</th><th>Vulnerabilite</th><th>Fichier</th><th>Avant</th><th>Apres</th></tr>
+<tr>
+  <td><strong>SEC-04</strong></td>
+  <td>Injection i18n</td>
+  <td><code>stores/i18n.js:18-29</code></td>
+  <td>Parametres <code>{{key}}</code> interpoles sans echappement HTML</td>
+  <td>Fonction <code>escapeHtml()</code> appliquee sur toutes les valeurs avant interpolation</td>
+</tr>
+<tr>
+  <td><strong>SEC-05</strong></td>
+  <td>URL encoding manquant</td>
+  <td><code>LoginApp.vue:270,322,341</code></td>
+  <td><code>username</code> et <code>mail</code> dans les URLs sans encodage</td>
+  <td><code>encodeURIComponent()</code> sur les 3 interpolations URL</td>
+</tr>
+<tr>
+  <td><strong>SEC-06</strong></td>
+  <td>Path traversal plugin</td>
+  <td><code>plugins/loader.js:15-18</code></td>
+  <td><code>pluginId</code> interpole directement dans <code>/webjars/${pluginId}/vue/index.js</code></td>
+  <td>Validation regex <code>/^[a-zA-Z0-9][\w-]*$/</code> avant toute utilisation</td>
+</tr>
+</table>
 
-#### ARCH-01 — ProvPlugin.vue trop volumineux (414 lignes)
-- **Fichier** : `src/plugins/prov/ProvPlugin.vue`
-- **Problème** : Composant monolithique avec 6 types de ressources, dialogs CRUD, sidebar, charts
-- **Recommandation** : Extraire les tabs en sous-composants (`ProvInstanceTab.vue`, `ProvStorageTab.vue`, etc.)
+### Moyennes (recommandations)
 
-#### ARCH-02 — useProvStore utilise `reactive()` au lieu de `ref()`
-- **Fichier** : `src/plugins/prov/useProvStore.js`
-- **Problème** : Incohérent avec les stores Pinia du projet qui utilisent `ref()` + `computed()`
-- **Recommandation** : Migrer vers le pattern Pinia standard pour la cohérence
-
-### MOYENS
-
-#### ARCH-03 — LoginApp.vue ne partage pas le système i18n
-- **Fichier** : `src/LoginApp.vue`
-- **Problème** : Messages hardcodés dans un objet `reactive()` local au lieu d'utiliser le store i18n global
-- **Atténuation** : Normal car LoginApp est une page séparée (v-login.html) sans accès aux stores Pinia de l'app principale
-- **Recommandation** : Acceptable en l'état, documenter la raison
-
-#### ARCH-04 — Pas de lazy loading des plugins
-- **Fichier** : `src/plugins/index.js`
-- **Problème** : Tous les 8 plugins sont importés statiquement au démarrage
-- **Impact** : Bundle plus gros (~20% de code non utilisé sur la page d'accueil)
-- **Recommandation** : Utiliser `defineAsyncComponent()` pour le chargement différé
-
-#### ARCH-05 — Absence de TypeScript
-- **Problème** : Aucun typage, les composables et stores sont en JS pur
-- **Recommandation** : Migration progressive possible — commencer par les stores et composables critiques
-
-#### ARCH-06 — Gestion d'erreur centralisée trop silencieuse
-- **Fichier** : `src/stores/error.js`
-- **Problème** : `handleResponse()` avale les erreurs et les affiche en snackbar sans propagation
-- **Recommandation** : Permettre aux appelants de réagir différemment selon le type d'erreur (retry, redirect, etc.)
-
-### BAS
-
-#### ARCH-07 — Pas de tests unitaires pour les plugins
-- **Problème** : Les 8 plugins business n'ont aucun test unitaire
-- **Recommandation** : Ajouter au minimum des tests de rendu et des tests d'appels API mockés
-
-#### ARCH-08 — Pas de Storybook / documentation composants
-- **Recommandation** : Les charts SVG (Donut, Gauge, StackedBar, Sunburst) mériteraient une documentation visuelle
-
-#### ARCH-09 — Bundle size (545 kB)
-- **Problème** : Un seul chunk principal dépasse 500 kB (Vuetify est la majorité)
-- **Recommandation** : `manualChunks` dans vite.config pour séparer vendor/app/plugins
+| ID | Sujet | Detail | Recommandation |
+|:---|:------|:-------|:---------------|
+| **SEC-07** | Pas de token CSRF explicite | Les appels API utilisent `credentials: 'include'` mais aucun token CSRF n'est envoye. Les requetes `application/json` sont protegees par CORS | Verifier que le backend envoie `SameSite=Lax` ou `Strict` + `HttpOnly` + `Secure` sur les cookies de session |
+| **SEC-08** | Auto-dismiss erreurs sensibles | Les erreurs disparaissent apres 8s, y compris 401/403 | Envisager de ne pas auto-dismiss les erreurs de type authentification |
 
 ---
 
-## 5. Points positifs — Architecture
+## 2. Verification complete du code
 
-| # | Point | Détail |
-|---|-------|--------|
-| 1 | **Composition API cohérente** | `<script setup>` utilisé partout, pas de Options API |
-| 2 | **Stores Pinia bien structurés** | 4 stores (auth, app, error, i18n) avec responsabilités claires |
-| 3 | **Composables réutilisables** | `useApi`, `useDataTable`, `useCrud`, `useNotification` bien découplés |
-| 4 | **Système de plugins extensible** | Registry + loader avec fallback dynamique pour les plugins tiers |
-| 5 | **SVG charts sans dépendance** | 4 composants charts natifs remplaçant D3.js (5,000+ LOC → ~280 LOC) |
-| 6 | **i18n complet** | ~490 clés FR/EN, switchable à chaud, compatible plugins legacy |
-| 7 | **Tests e2e complets** | 53 tests Playwright couvrant login, navigation, CRUD, admin |
-| 8 | **Tests unitaires** | 48 tests Vitest sur les stores et composables critiques |
-| 9 | **CI/CD fonctionnel** | GitHub Actions : install → lint → test → build |
-| 10 | **Vite build rapide** | Build production en ~1.2s |
+Audit realise sur les **82 fichiers source** (.vue + .js, hors tests et node_modules).
+
+| Verification | Resultat | Detail |
+|:-------------|:--------:|:-------|
+| Usage de `v-html` | **&check; Aucun** | 42 fichiers .vue verifies |
+| Usage de `eval()` / `new Function()` | **&check; Aucun** | nls-adapter utilise `JSON.parse()` |
+| Usage de `innerHTML` / `document.write` | **&check; Aucun** | Aucune manipulation DOM directe |
+| Secrets hardcodes (cles API, tokens, mots de passe) | **&check; Aucun** | Seules des cles i18n comme `'error-password'` |
+| `localStorage` pour tokens d'auth | **&check; Non** | Utilise uniquement pour la preference de langue (`ligoj-locale`) |
+| `credentials: 'include'` sur les fetch | **&check; Oui** | 15 occurrences, auth par cookies uniquement |
+| Validation Content-Type en reponse | **&check; Oui** | `useApi.js:20-23` verifie `application/json` avant `response.json()` |
+| Encodage URL des parametres utilisateur | **&check; Oui** | `encodeURIComponent()` sur username et mail dans LoginApp |
+| Validation des IDs plugin | **&check; Oui** | Regex stricte dans `loader.js:16` |
+| Validation redirect same-origin | **&check; Oui** | `new URL()` + comparaison `origin` dans `error.js:34-37` |
+| Echappement HTML dans i18n | **&check; Oui** | `escapeHtml()` dans `i18n.js:18-19` |
 
 ---
 
-## 6. Métriques du projet
+## 3. Points forts — Securite
 
-| Métrique | Valeur |
-|----------|--------|
-| Fichiers source (.vue/.js) | ~107 |
-| Lignes de code | ~9,400 |
-| Composants Vue | ~35 |
+| # | Point | Detail |
+|:-:|:------|:-------|
+| 1 | **Auto-escaping Vue** | `{{ }}` utilise partout, zero `v-html` |
+| 2 | **Auth par cookies** | `credentials: 'include'` sur tous les fetch, pas de tokens en localStorage |
+| 3 | **Zero manipulation DOM** | Aucun `getElementById`, `innerHTML`, jQuery residuel |
+| 4 | **Validation formulaires** | Rules Vuetify (required, email, password strength) |
+| 5 | **Password reset securise** | Token + CAPTCHA + validation complexite |
+| 6 | **Zero secret en dur** | Aucune cle API, token ou mot de passe dans le code source |
+| 7 | **CSP-friendly** | Pas d'inline scripts, pas d'eval |
+| 8 | **Hash routing securise** | Tokens reset extraits via regex stricte `[a-zA-Z0-9\-]+` |
+| 9 | **Content-Type verifie** | Reponses JSON parsees uniquement si le header le confirme |
+| 10 | **Plugin sandboxing** | IDs valides par regex avant chargement dynamique |
+
+---
+
+## 4. Architecture
+
+### Points d'attention
+
+| ID | Severite | Sujet | Fichier | Recommandation |
+|:---|:--------:|:------|:--------|:---------------|
+| **ARCH-01** | Haute | ProvPlugin.vue volumineux (414 lignes) | `plugins/prov/ProvPlugin.vue` | Extraire les tabs en sous-composants |
+| **ARCH-02** | Moyenne | useProvStore utilise `reactive()` | `plugins/prov/useProvStore.js` | Migrer vers un store Pinia (`defineStore()`) pour coherence |
+| **ARCH-03** | Moyenne | LoginApp ne partage pas le systeme i18n | `LoginApp.vue` | Acceptable — page separee sans Vuetify. Documenter la raison |
+| **ARCH-04** | Moyenne | 8 plugins importes statiquement | `plugins/index.js` | `defineAsyncComponent()` pour le chargement differe |
+| **ARCH-05** | Basse | Absence de TypeScript | Global | Migration progressive possible en commencant par stores/composables |
+| **ARCH-06** | Basse | Documentation composants visuels | `plugins/prov/` | Storybook ou exemples pour les 4 charts SVG |
+
+### Points forts
+
+| # | Point | Detail |
+|:-:|:------|:-------|
+| 1 | **Composition API coherente** | `<script setup>` partout, zero Options API |
+| 2 | **Stores Pinia bien structures** | 4 stores (auth, app, error, i18n) avec responsabilites claires |
+| 3 | **Composables reutilisables** | `useApi`, `useDataTable`, `useFormGuard`, `useImportExport` bien decouples |
+| 4 | **Systeme de plugins extensible** | Registry + loader avec chargement hybride (statique built-in + dynamique tiers) |
+| 5 | **Charts SVG sans dependance** | 4 composants natifs remplacant D3.js (~5 000 LOC &rarr; ~280 LOC) |
+| 6 | **i18n complet** | 336 cles FR/EN, switchable a chaud, compatible plugins legacy NLS |
+| 7 | **Bundle optimise** | `manualChunks` : vuetify, vendor (vue + router + pinia), app, icons |
+| 8 | **Build ultra-rapide** | Vite 6 : production en ~1.2s, HMR < 100ms |
+| 9 | **CI/CD fonctionnel** | GitHub Actions : install &rarr; lint &rarr; test &rarr; build |
+| 10 | **2 entry points** | `v-index.html` (app complete) + `v-login.html` (login leger sans Vuetify) |
+
+---
+
+## 5. Metriques
+
+| Metrique | Valeur |
+|:---------|-------:|
+| Fichiers source (.vue + .js) | 82 |
+| Composants Vue | 42 |
+| Fichiers JS (stores, composables, plugins) | 40 |
 | Stores Pinia | 4 |
-| Composables | 7 |
-| Plugins business | 8 |
-| Tests unitaires | 48 (100% pass) |
-| Tests e2e | 53 (100% pass) |
+| Composables | 8 |
+| Plugins metier | 8 |
+| Cles i18n (par langue) | 336 |
+| Tests unitaires (Vitest) | 141 |
+| Tests e2e (Playwright) | 53 |
+| **Tests total** | **194** |
 | Build time | 1.2s |
-| Bundle size | 545 kB (gzipped ~160 kB) |
-| Dépendances runtime | 5 (vue, vue-router, pinia, vuetify, @mdi/font) |
-| Dépendances dev | 8 |
+| Bundle JS (gzip) | ~109 kB |
+| Bundle CSS (gzip) | ~118 kB |
+| Dependencies runtime | 6 (vue, vue-router, pinia, vuetify, vee-validate, @mdi/font) |
+| Dependencies dev | 4 (vite, @vitejs/plugin-vue, sass, @playwright/test) |
 
 ---
 
-## 7. Conclusion
+## 6. Conclusion
 
-Le code Vue 3 est **de bonne qualité** dans l'ensemble. Les patterns sont cohérents, la sécurité est correcte après les 6 corrections appliquées, et la couverture de test est solide.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-**Priorités recommandées :**
-1. Vérifier la config CSRF du backend (SEC-07)
-2. Découper ProvPlugin.vue en sous-composants (ARCH-01)
-3. Ajouter des tests unitaires pour les plugins (ARCH-07)
-4. Configurer le code splitting Vite (ARCH-09)
+### Securite
+
+Le code est **securise**. Les 6 vulnerabilites identifiees (3 critiques + 3 hautes) ont toutes ete corrigees et verifiees. Aucune faille ouverte de severite critique ou haute.
+
+Les 2 recommandations restantes (CSRF cookies, auto-dismiss) sont des ameliorations mineures qui dependent de la configuration backend.
+
+</td>
+<td width="50%" valign="top">
+
+### Architecture
+
+Le code est **de bonne qualite**. Les patterns sont coherents (Composition API, Pinia, fetch natif), la couverture de test est solide (194 tests), et le build est optimise.
+
+Les recommandations portent sur du refactoring (ProvPlugin.vue) et des ameliorations progressives (TypeScript, lazy loading).
+
+</td>
+</tr>
+</table>
+
+### Priorites recommandees
+
+| Priorite | Action | Impact |
+|:--------:|:-------|:-------|
+| 1 | Verifier config cookies backend (`SameSite`, `HttpOnly`, `Secure`) | Securite |
+| 2 | Decouper ProvPlugin.vue en sous-composants | Maintenabilite |
+| 3 | Lazy loading des plugins avec `defineAsyncComponent()` | Performance |
