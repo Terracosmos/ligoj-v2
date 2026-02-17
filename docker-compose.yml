@@ -37,7 +37,7 @@ services:
 
   ligoj-ui:
     build:
-      context: ./ligoj/app-ui
+      context: ./app-ui
       dockerfile: Dockerfile
     ports:
       - "8080:8080"

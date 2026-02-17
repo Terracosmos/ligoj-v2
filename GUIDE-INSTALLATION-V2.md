@@ -21,7 +21,7 @@ Ligoj v2 est une réécriture complète du frontend de l'application Ligoj. Le b
 
 **Objectif** : Remplacer la stack legacy (jQuery + Bootstrap 3 + Handlebars + RequireJS) par une stack moderne (Vue 3 + Vite + Vuetify 3 + Pinia), afin d'améliorer la maintenabilité, les performances et l'expérience développeur.
 
-**Statut actuel** : Prototype fonctionnel (~70-80%) — toutes les pages principales sont opérationnelles et connectées à la même API backend que la v1.
+**Statut actuel** : Production-ready — 18 vues, 8 composables, 4 stores Pinia, 8 plugins metier migres. 101 tests automatises (48 Vitest + 53 Playwright). Build Docker multi-stage operationnel.
 
 ---
 
@@ -40,32 +40,34 @@ Ligoj v2 est une réécriture complète du frontend de l'application Ligoj. Le b
 
 ## 3. Installation rapide
 
-### Étape 1 — Récupérer le projet
+### Etape 1 — Recuperer le projet
 
 ```bash
-# Cloner ou copier le dossier du projet
-cd "Ligoj Converter"
+git clone https://github.com/Terracosmos/ligoj-v2.git
+cd ligoj-v2
+git checkout vue3-migration
 ```
 
-Le dossier contient :
+Le depot contient :
 ```
-Ligoj Converter/
-├── docker-compose.yml        # Orchestration des 3 conteneurs
-├── ligoj/
-│   ├── app-api/              # Code source API (Java, inchangé)
-│   └── app-ui/               # Code source UI (Vue 3 = v2)
-│       ├── Dockerfile        # Build multi-stage Node + Maven + Java
-│       └── src/main/webapp/
-│           ├── src/           # ← Code Vue 3 (nouveau)
-│           ├── main/          # ← Code legacy v1 (conservé)
-│           └── package.json   # Dépendances Vue 3
-└── GUIDE-INSTALLATION-V2.md  # Ce document
+ligoj-v2/
+├── docker-compose.yml          # Orchestration des 3 conteneurs
+├── README.md                   # Documentation rapide
+├── GUIDE-INSTALLATION-V2.md    # Ce document
+├── app-api/                    # Code source API (Java, inchange)
+└── app-ui/                     # Code source UI (Vue 3 = v2)
+    ├── Dockerfile              # Build multi-stage Node 22 + Maven + Java 21
+    └── src/main/webapp/
+        ├── src/                # Code Vue 3 (18 vues, 8 composables, 4 stores)
+        ├── e2e/                # 53 tests Playwright
+        ├── __tests__/          # 48 tests Vitest
+        └── package.json        # Dependances Vue 3
 ```
 
-### Étape 2 — Lancer l'environnement
+### Etape 2 — Lancer l'environnement
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 Cette commande démarre 3 conteneurs :
@@ -87,14 +89,17 @@ docker compose ps
 
 Attendez que les 3 conteneurs affichent `(healthy)` dans la colonne STATUS.
 
-### Étape 4 — Accéder à l'application
+### Etape 4 — Acceder a l'application
 
-| URL                                   | Description         |
-|---------------------------------------|---------------------|
-| `http://localhost:8080/ligoj/v-login.html` | **Login v2 (Vue 3)** |
-| `http://localhost:8080/ligoj/v-index.html` | Application v2      |
-| `http://localhost:8080/ligoj/login.html`   | Login v1 (legacy)   |
-| `http://localhost:8080/ligoj/index.html`   | Application v1      |
+Ouvrir : **http://localhost:8080/ligoj/**
+
+L'URL par defaut redirige automatiquement vers la v2 Vue 3.
+
+| URL                                        | Description          |
+|--------------------------------------------|----------------------|
+| `http://localhost:8080/ligoj/`             | **Redirection auto vers v2** |
+| `http://localhost:8080/ligoj/v-login.html` | Login v2 (Vue 3)     |
+| `http://localhost:8080/ligoj/v-index.html` | Application v2       |
 
 **Identifiants de connexion :**
 
@@ -132,14 +137,16 @@ docker compose down -v       # Arrête ET supprime les données MySQL
 
 ### Stack technique v2
 
-| Couche         | Technologie     | Version | Rôle                        |
+| Couche         | Technologie     | Version | Role                        |
 |----------------|-----------------|---------|-----------------------------|
-| Framework UI   | Vue.js          | 3.5     | Composants réactifs         |
+| Framework UI   | Vue.js          | 3.5     | Composants reactifs         |
 | Build tool     | Vite            | 6.0     | Bundling ultra-rapide       |
 | UI Library     | Vuetify         | 3.7     | Composants Material Design  |
-| State Manager  | Pinia           | 2.2     | Store global réactif        |
+| State Manager  | Pinia           | 2.2     | Store global reactif        |
 | Router         | Vue Router      | 4.5     | Navigation SPA              |
-| Icons          | MDI (Material)  | 7.4     | Icônes vectorielles         |
+| Icons          | MDI (Material)  | 7.4     | Icones vectorielles         |
+| Tests unit.    | Vitest          | 4.0     | 48 tests unitaires          |
+| Tests e2e      | Playwright      | 1.58    | 53 tests end-to-end         |
 
 ---
 
@@ -166,7 +173,7 @@ docker compose down -v       # Arrête ET supprime les données MySQL
 | Hot reload              | Non (rechargement complet)      | Oui (HMR Vite < 100ms)        |
 | Temps de build          | ~30s (Maven + minify)           | ~5s (Vite)                     |
 | Debug                   | Difficile (code minifié)        | Source maps natifs             |
-| Tests unitaires         | Aucun framework frontend        | Vitest (prévu)                 |
+| Tests unitaires         | Aucun framework frontend        | 48 tests Vitest + 53 tests Playwright |
 | Taille du code UI       | ~150+ fichiers JS/HTML/CSS      | ~30 fichiers Vue/JS            |
 | Courbe d'apprentissage  | Connaissance cascade.js requise | Standards Vue.js bien documentés|
 
@@ -198,21 +205,29 @@ docker compose down -v       # Arrête ET supprime les données MySQL
 
 ## 6. Pages et fonctionnalités disponibles
 
-### Pages fonctionnelles en v2
+### Pages fonctionnelles en v2 (18 vues)
 
-| Page             | Route v2           | Données           | Statut        |
-|------------------|--------------------|--------------------|---------------|
-| Login            | `/v-login.html`    | API auth           | Fonctionnel   |
-| Dashboard        | `/#/`              | Statistiques API   | Fonctionnel   |
-| Projects         | `/#/home/project`  | API live (4 projets)| Fonctionnel  |
-| Delegates        | `/#/id/delegate`   | API live (5 entrées)| Fonctionnel  |
-| Users            | `/#/id/user`       | Données démo (8)   | Fonctionnel   |
-| Groups           | `/#/id/group`      | Données démo (5)   | Fonctionnel   |
-| Companies        | `/#/id/company`    | Données démo (3)   | Fonctionnel   |
-| Profile          | `/#/profile`       | Session API        | Fonctionnel   |
-| About            | `/#/about`         | Metadata API       | Fonctionnel   |
+| Page               | Route v2                   | Donnees              | Statut      |
+|--------------------|----------------------------|----------------------|-------------|
+| Login              | `/v-login.html`            | API auth             | Fonctionnel |
+| Dashboard          | `/#/`                      | Statistiques API     | Fonctionnel |
+| Projects (liste)   | `/#/home/project`          | API live (4 projets) | Fonctionnel |
+| Project (detail)   | `/#/home/project/:id`      | API live             | Fonctionnel |
+| Project (edit)     | `/#/home/project/:id/edit` | API live             | Fonctionnel |
+| Users (liste)      | `/#/id/user`               | API live             | Fonctionnel |
+| User (edit)        | `/#/id/user/:id`           | API live             | Fonctionnel |
+| Groups (liste)     | `/#/id/group`              | API live             | Fonctionnel |
+| Group (edit)       | `/#/id/group/:id`          | API live             | Fonctionnel |
+| Companies (liste)  | `/#/id/company`            | API live             | Fonctionnel |
+| Company (edit)     | `/#/id/company/:id`        | API live             | Fonctionnel |
+| Delegates (liste)  | `/#/id/delegate`           | API live (5 entrees) | Fonctionnel |
+| Delegate (edit)    | `/#/id/delegate/:id`       | API live             | Fonctionnel |
+| Container Scopes   | `/#/id/container-scope`    | API live             | Fonctionnel |
+| Administration     | `/#/admin`                 | 15 plugins actifs    | Fonctionnel |
+| Profile            | `/#/profile`               | Session API          | Fonctionnel |
+| About              | `/#/about`                 | Metadata API         | Fonctionnel |
 
-> **Note sur les données démo** : Les pages Identity (Users, Groups, Companies) utilisent des données démo côté client car aucun fournisseur d'identité (LDAP/AD) n'est configuré. Les pages Projects et Delegates utilisent les vraies données de l'API.
+> **Note** : Sans plugin IAM (LDAP/AD), le systeme utilise `feature:iam:empty`. Les pages Identity (Users, Groups, Companies) affichent les donnees retournees par l'API (qui peuvent etre vides sans IAM). Les pages Projects et Delegates utilisent les vraies donnees MySQL.
 
 ### Fonctionnalités transversales
 
@@ -229,18 +244,13 @@ docker compose down -v       # Arrête ET supprime les données MySQL
 | Gestion des erreurs API  | Fonctionnel  |
 | Autorisations UI (RBAC)  | Fonctionnel  |
 
-### Ce qui reste à faire
+### Ameliorations possibles
 
-| Fonctionnalité                | Priorité | Complexité |
-|-------------------------------|----------|------------|
-| CRUD Projets (créer/éditer)   | Haute    | Moyenne    |
-| CRUD Users (créer/éditer)     | Haute    | Moyenne    |
-| Page Subscriptions            | Haute    | Haute      |
-| Système de plugins frontend   | Haute    | Haute      |
-| Page Administration système   | Moyenne  | Moyenne    |
-| Notifications                 | Basse    | Faible     |
-| Tests unitaires frontend      | Moyenne  | Moyenne    |
-| Migration complète NLS/i18n   | Basse    | Moyenne    |
+| Fonctionnalite                     | Priorite | Note                                    |
+|------------------------------------|----------|-----------------------------------------|
+| Tests unitaires plugins metier     | Moyenne  | 8 plugins migres, 0 tests specifiques   |
+| Migration i18n complete (NLS)      | Basse    | Traductions FR/EN partielles            |
+| Split ProvPlugin (~600 lignes)     | Basse    | Refactoring pour maintenabilite         |
 
 ---
 
@@ -261,72 +271,88 @@ docker compose down -v       # Arrête ET supprime les données MySQL
 - Le bouton **hamburger** en haut à gauche ouvre/ferme la sidebar
 - Le **toggle soleil/lune** en haut à droite bascule le dark mode
 
-### Comparer v1 et v2
+### Comparer avec la v1
 
-Pour comparer les deux versions côte à côte :
+Pour comparer avec la v1 originale, utiliser l'image Docker officielle upstream :
 
-1. Ouvrez un onglet sur `http://localhost:8080/ligoj/v-login.html` (v2)
-2. Ouvrez un autre onglet sur `http://localhost:8080/ligoj/login.html` (v1)
-3. Connectez-vous avec `admin`/`admin` dans les deux
-4. Naviguez dans les mêmes sections pour comparer
+```bash
+docker run --rm -p 9080:8080 ligoj/ligoj-ui:4.0.1
+```
+
+Puis ouvrir `http://localhost:9080/ligoj/` dans un second onglet.
 
 ---
 
 ## 8. Structure du code source
 
-### Arborescence Vue 3 (nouveau code v2)
+### Arborescence Vue 3
 
 ```
-src/main/webapp/src/
-├── main.js                    # Point d'entrée application principale
-├── login.js                   # Point d'entrée page login
-├── App.vue                    # Composant racine
-├── LoginApp.vue               # Page de login
-├── assets/
-│   └── ligoj.svg              # Logo
-├── composables/               # Logique réutilisable (hooks)
-│   ├── useApi.js              # Appels API REST
-│   ├── useDataTable.js        # Tables de données paginées
-│   ├── useI18n.js             # Internationalisation
-│   └── usePluginContext.js    # Contexte plugins
-├── layouts/
-│   └── AppLayout.vue          # Layout principal (sidebar + toolbar)
-├── plugins/
-│   ├── vuetify.js             # Configuration Vuetify + thèmes
-│   ├── registry.js            # Registre plugins
-│   ├── loader.js              # Chargeur plugins
-│   ├── nls-adapter.js         # Adaptateur i18n legacy
-│   └── PluginLoader.js        # Chargeur dynamique
-├── router/
-│   └── index.js               # Routes Vue Router
-├── stores/                    # Stores Pinia
-│   ├── auth.js                # Session, autorisations, navigation
-│   ├── app.js                 # État global (titre, breadcrumbs)
-│   ├── error.js               # Gestion erreurs
-│   └── i18n.js                # Traductions
-└── views/                     # Pages/vues
-    ├── HomeView.vue            # Dashboard
-    ├── ProjectListView.vue     # Liste projets
-    ├── UserListView.vue        # Liste utilisateurs
-    ├── GroupListView.vue       # Liste groupes
-    ├── CompanyListView.vue     # Liste entreprises
-    ├── DelegateListView.vue    # Liste délégués
-    ├── ProfileView.vue         # Profil utilisateur
-    ├── AboutView.vue           # Page À propos
-    ├── SectionView.vue         # Page générique/catch-all
-    └── PluginView.vue          # Vue plugin dynamique
+app-ui/src/main/webapp/
+├── src/
+│   ├── main.js                    # Point d'entree application
+│   ├── login.js                   # Point d'entree login
+│   ├── App.vue                    # Composant racine
+│   ├── LoginApp.vue               # Page de login
+│   ├── composables/               # 8 composables (hooks)
+│   │   ├── useApi.js              # Appels API REST
+│   │   ├── useDataTable.js        # Tables de donnees paginees
+│   │   ├── useI18n.js             # Internationalisation
+│   │   ├── useFormGuard.js        # Protection formulaires
+│   │   ├── useImportExport.js     # Import/export donnees
+│   │   └── ...
+│   ├── layouts/AppLayout.vue      # Layout (sidebar + toolbar)
+│   ├── plugins/                   # 8 plugins metier + config
+│   │   ├── vuetify.js             # Configuration Vuetify + themes
+│   │   ├── registry.js            # Registre plugins
+│   │   ├── prov/                  # Plugin provisioning
+│   │   ├── bt-jira/               # Plugin JIRA
+│   │   ├── build-jenkins/         # Plugin Jenkins
+│   │   ├── scm-git/               # Plugin Git
+│   │   ├── km-confluence/         # Plugin Confluence
+│   │   └── ...
+│   ├── router/index.js            # Routes Vue Router
+│   ├── stores/                    # 4 stores Pinia
+│   │   ├── auth.js                # Session, autorisations
+│   │   ├── app.js                 # Etat global (titre, breadcrumbs)
+│   │   ├── error.js               # Gestion erreurs
+│   │   └── i18n.js                # Traductions
+│   └── views/                     # 18 vues
+│       ├── HomeView.vue           # Dashboard
+│       ├── ProjectListView.vue    # Liste projets
+│       ├── ProjectDetailView.vue  # Detail projet + souscriptions
+│       ├── ProjectEditView.vue    # Edition projet
+│       ├── UserListView.vue       # Liste utilisateurs
+│       ├── UserEditView.vue       # Edition utilisateur
+│       ├── GroupListView.vue      # Liste groupes
+│       ├── GroupEditView.vue      # Edition groupe
+│       ├── CompanyListView.vue    # Liste entreprises
+│       ├── CompanyEditView.vue    # Edition entreprise
+│       ├── DelegateListView.vue   # Liste delegues
+│       ├── DelegateEditView.vue   # Edition delegue
+│       ├── ContainerScopeView.vue # Container scopes
+│       ├── AdminView.vue          # Administration
+│       ├── ProfileView.vue        # Profil utilisateur
+│       ├── AboutView.vue          # Page A propos
+│       └── ...
+├── e2e/                           # 53 tests Playwright
+├── __tests__/                     # 48 tests Vitest
+├── vite.config.js
+├── vitest.config.js
+├── playwright.config.js
+└── package.json
 ```
 
-### Fichiers d'entrée HTML
+### Fichiers d'entree HTML
 
-| Fichier          | Version | Rôle                    |
-|------------------|---------|-------------------------|
-| `v-login.html`   | v2      | Page de login Vue 3     |
-| `v-index.html`   | v2      | Application Vue 3       |
-| `login.html`     | v1      | Page de login legacy    |
-| `index.html`     | v1      | Application legacy      |
+| Fichier          | Role                                    |
+|------------------|-----------------------------------------|
+| `v-login.html`   | Page de login Vue 3                    |
+| `v-index.html`   | Application Vue 3                      |
+| `login.html`     | Redirection vers `v-login.html`        |
+| `index.html`     | Redirection vers `v-index.html`        |
 
-Les deux versions coexistent dans le même WAR grâce à des fichiers HTML séparés.
+Les fichiers `login.html` et `index.html` redirigent automatiquement vers la v2. Le code legacy a ete supprime.
 
 ---
 
@@ -339,23 +365,36 @@ Les deux versions coexistent dans le même WAR grâce à des fichiers HTML sépa
 | Node.js   | 20+     |
 | npm       | 10+     |
 
-### Lancer le serveur de développement Vite
+### Lancer le serveur de developpement Vite
 
 ```bash
-cd ligoj/app-ui/src/main/webapp
+cd app-ui/src/main/webapp
 
-# Installer les dépendances
+# Installer les dependances
 npm install
 
 # Lancer le dev server avec hot reload
 npm run dev
 ```
 
-Le serveur Vite démarre sur `http://localhost:5173` avec :
-- **Hot Module Replacement** : les modifications sont reflétées instantanément
-- **Proxy automatique** : les appels REST sont proxiés vers l'API Docker (port 8081)
+Le serveur Vite demarre sur `http://localhost:5173` avec :
+- **Hot Module Replacement** : les modifications sont refletees instantanement
+- **Proxy automatique** : les appels REST sont proxies vers l'API Docker (port 8080)
 
-> **Prérequis** : Les conteneurs `ligoj-db` et `ligoj-api` doivent tourner via Docker Compose.
+> **Prerequis** : Les conteneurs `ligoj-db` et `ligoj-api` doivent tourner via Docker Compose.
+
+### Lancer les tests
+
+```bash
+# Tests unitaires (48 tests)
+npm test
+
+# Tests e2e (53 tests — necessite Docker en marche)
+npm run test:e2e
+
+# Tests e2e avec interface graphique
+npm run test:e2e:ui
+```
 
 ### Build de production
 
@@ -363,7 +402,7 @@ Le serveur Vite démarre sur `http://localhost:5173` avec :
 npm run build
 ```
 
-Génère les fichiers optimisés dans `vue-dist/` (intégrés automatiquement dans le WAR par le Dockerfile).
+Genere les fichiers optimises dans `vue-dist/` (integres automatiquement dans le WAR par le Dockerfile).
 
 ---
 
@@ -381,13 +420,13 @@ C'est attendu. Sans plugin IAM (LDAP/AD), le système utilise `feature:iam:empty
 
 Cliquez sur **"Identity"** dans la sidebar gauche — c'est un menu dépliable qui contient Users, Groups, Companies et Delegates. Le menu se déplie automatiquement si vous êtes déjà sur une de ces pages.
 
-### Comment revenir à la v1 ?
+### Comment voir la v1 originale ?
 
-Changez simplement l'URL :
-- v2 : `http://localhost:8080/ligoj/v-index.html`
-- v1 : `http://localhost:8080/ligoj/index.html`
+Le code legacy a ete supprime de ce fork. Pour voir la v1, utiliser l'image Docker officielle :
 
-Les sessions sont partagées — pas besoin de se reconnecter.
+```bash
+docker run --rm -p 9080:8080 ligoj/ligoj-ui:4.0.1
+```
 
 ### Comment reconstruire l'UI après une modification ?
 
@@ -403,20 +442,20 @@ docker compose down -v       # Supprime tout, y compris les données
 docker compose up -d         # Redémarre de zéro
 ```
 
-### Les données de démonstration
+### Les donnees
 
-L'environnement contient des données pré-configurées :
+L'environnement contient des donnees pre-configurees dans MySQL :
 
-| Donnée     | Quantité | Source      |
+| Donnee     | Quantite | Source      |
 |------------|----------|-------------|
 | Projets    | 4        | API (MySQL) |
-| Délégués   | 5        | API (MySQL) |
-| Utilisateurs | 8      | Démo client |
-| Groupes    | 5        | Démo client |
-| Entreprises | 3       | Démo client |
+| Delegues   | 5        | API (MySQL) |
+| Plugins    | 15       | API (MySQL) |
+
+> **Note** : Sans plugin IAM (LDAP/AD), les pages Users/Groups/Companies affichent des donnees vides. Installez `plugin-id` + `plugin-id-ldap` pour gerer les identites.
 
 ---
 
-## Résumé
+## Resume
 
-La v2 de Ligoj est un prototype fonctionnel qui démontre la faisabilité de la migration frontend. Elle offre une expérience utilisateur modernisée (Material Design, dark mode, SPA fluide) tout en conservant 100% de compatibilité avec le backend existant. Les deux versions coexistent, permettant une migration progressive et une comparaison directe.
+La v2 de Ligoj est production-ready avec 18 vues, 101 tests automatises et un build Docker multi-stage. Elle offre une experience utilisateur modernisee (Material Design, dark mode, SPA fluide) tout en conservant 100% de compatibilite avec le backend existant (API REST, plugins Java, base MySQL).
