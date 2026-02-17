@@ -2,26 +2,19 @@ ARG BUILDPLATFORM
 ARG TARGETPLATFORM
 ARG JAVA_VERSION="21-jdk"
 ARG JAVA_IMAGE="eclipse-temurin"
-ARG NODE_VERSION="20-bookworm-slim"
+ARG NODE_VERSION="22-bookworm-slim"
 ARG MAVEN_VERSION="3.9.6-amazoncorretto-21-debian-bookworm"
 
 FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION} as builder_node
-WORKDIR /build/
-ADD src/main/build src/main/build
-ADD src/main/webapp src/main/webapp
-COPY Dockerfile ./*prepare-build.sh ./
-RUN touch ~/.bash_profile && \
-    { [ -f prepare-build.sh ] && chmod +x prepare-build.sh && . ./prepare-build.sh || echo "No defined prepare build instruction, create a prepare-build.sh script to prepare http_proxy or other custom configurations."; } && \
-    npm install -g clean-css-cli@5.6.3 && \
-    mkdir -p src/main/build && mkdir -p src/main/webapp && \
-    chmod +x src/main/build/minify.sh && src/main/build/minify.sh
-
-# Vue 3 build
 WORKDIR /build/src/main/webapp
-RUN npm install && npm run build -- --outDir ./vue-dist --emptyOutDir && \
+ADD src/main/webapp/package.json src/main/webapp/package-lock.json ./
+RUN npm ci
+ADD src/main/webapp .
+RUN npm run build -- --outDir ./vue-dist --emptyOutDir && \
     cp vue-dist/v-index.html . && \
     cp vue-dist/v-login.html . && \
-    cp -r vue-dist/assets/ .
+    cp -r vue-dist/assets/ . && \
+    rm -rf vue-dist node_modules
 WORKDIR /build/
 
 FROM --platform=${BUILDPLATFORM} maven:${MAVEN_VERSION} as builder
